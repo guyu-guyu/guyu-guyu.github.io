@@ -1,0 +1,781 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>AutoVideoCompressor — 视频素材定时压缩工具</title>
+    <url>/posts/AutoVideoCompressor-%E8%A7%86%E9%A2%91%E7%B4%A0%E6%9D%90%E5%AE%9A%E6%97%B6%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7/</url>
+    <content><![CDATA[<h2 id="项目简介">项目简介</h2>
+<p><strong>AutoVideoCompressor</strong> 是一个基于 <strong>Tauri 2 + Rust + Vue 3</strong> 的 Windows 视频压缩桌面工具。它会自动扫描指定目录下的视频文件，调用 ffmpeg 进行压缩，并保留更小的文件。</p>
+<p>简单来说：你给它一堆目录，它每天定时帮你把里面的视频压得更小，省下硬盘空间。</p>
+<ul>
+<li>仓库地址：<a href="https://github.com/guyu-guyu/AutoVideoCompressor">https://github.com/guyu-guyu/AutoVideoCompressor</a></li>
+<li>主要语言：Rust（业务逻辑全部在 Rust 层）</li>
+<li>平台：Windows 10/11 (x64)</li>
+</ul>
+<h2 id="为什么做这个">为什么做这个</h2>
+<p>平时攒的视频素材越来越多，手动一个个用 ffmpeg 压缩太累人。市面上的工具要么不支持定时，要么不能按目录配置不同策略，于是自己写了一个。</p>
+<h2 id="核心功能">核心功能</h2>
+<ul>
+<li><strong>Per-directory 独立配置</strong> — 每个目录有独立的 include/exclude 规则、过滤器、重命名规则、调度时间</li>
+<li><strong>Cron 定时调度</strong> — 每天指定时间自动压缩，严格不补跑</li>
+<li><strong>串行执行</strong> — 同一时间只压缩一个目录，完成后自动处理队列中的下一个</li>
+<li><strong>实时进度推送</strong> — 逐文件压缩进度，支持手动停止</li>
+<li><strong>循环压缩检测</strong> — 自动识别重命名后再次匹配的白名单文件，标记风险</li>
+<li><strong>全局参数模板</strong> — 可自定义 H.265/H.264 预设模板，按目录选用或自定义</li>
+<li><strong>单次压缩总大小限制</strong> — 按文件顺序累计，超出部分自动跳过并在预览中标注</li>
+<li><strong>压缩历史日志</strong> — 人类可读文本 + 机器可读 JSON 块，保留天数可配</li>
+<li><strong>压缩文件预览</strong> — 显示匹配文件、压缩后文件名、大小、循环风险、单次限制状态</li>
+<li><strong>系统托盘常驻</strong> — 最小化到托盘、右键菜单（显示主窗口 / 退出）</li>
+<li><strong>开机自启动</strong></li>
+<li><strong><code>--run-once</code> 模式</strong> — 无窗口单次执行，供 Windows 任务计划程序调用</li>
+</ul>
+<h2 id="技术栈">技术栈</h2>
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>技术</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>框架</td>
+<td>Tauri 2.x</td>
+</tr>
+<tr>
+<td>后端</td>
+<td>Rust（业务逻辑全部在 Rust 层）</td>
+</tr>
+<tr>
+<td>前端</td>
+<td>Vue 3 + TypeScript + Vite</td>
+</tr>
+<tr>
+<td>UI 库</td>
+<td>Naive UI</td>
+</tr>
+<tr>
+<td>平台</td>
+<td>Windows 10/11 (x64)</td>
+</tr>
+</tbody>
+</table>
+<p>业务逻辑全部放在 Rust 层是刻意的选择——压缩是 CPU 密集型任务，放在 Rust 里既快又稳，前端只负责展示和交互。</p>
+<h2 id="配置示例">配置示例</h2>
+<p>全局配置位于 <code>%APPDATA%/AutoCompress/config.json</code>，目录级配置位于 <code>&lt;目录&gt;/.autocompress/config.json</code>。一个典型的目录级配置长这样：</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;include&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;*.mp4&quot;</span><span class="punctuation">,</span> <span class="string">&quot;*.mov&quot;</span><span class="punctuation">,</span> <span class="string">&quot;*.avi&quot;</span><span class="punctuation">,</span> <span class="string">&quot;*.mkv&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;exclude&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;*[compress]*&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;filters&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span> <span class="attr">&quot;max_size_mb&quot;</span><span class="punctuation">:</span> <span class="number">2048</span><span class="punctuation">,</span> <span class="attr">&quot;min_size_mb&quot;</span><span class="punctuation">:</span> <span class="number">10</span> <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;max_compress_size_mb&quot;</span><span class="punctuation">:</span> <span class="number">4096</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;rename_rules&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="punctuation">&#123;</span> <span class="attr">&quot;pattern&quot;</span><span class="punctuation">:</span> <span class="string">&quot;^(.+)(\\.[^.]+)$&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;replacement&quot;</span><span class="punctuation">:</span> <span class="string">&quot;$1[compress]$2&quot;</span> <span class="punctuation">&#125;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;params&quot;</span><span class="punctuation">:</span> <span class="string">&quot;H.265 高质量&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;use_custom_params&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;schedule&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span> <span class="attr">&quot;time&quot;</span><span class="punctuation">:</span> <span class="string">&quot;03:00&quot;</span> <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>重命名规则会把 <code>video.mp4</code> 改名为 <code>video[compress].mp4</code>，配合 exclude 规则避免循环压缩。</p>
+<h2 id="安装">安装</h2>
+<p>从 <a href="https://github.com/guyu-guyu/AutoVideoCompressor/releases">Releases</a> 下载最新版：</p>
+<ul>
+<li><code>AutoCompress_x.x.x_x64-setup.exe</code> — NSIS 安装程序（推荐）</li>
+<li><code>autocompress.exe</code> — 便携版，无需安装</li>
+</ul>
+<p><strong>依赖</strong>：需安装 <a href="https://ffmpeg.org/download.html">ffmpeg</a>，可以在 PATH 中使用，或在全局设置中指定路径。</p>
+<h2 id="命令行">命令行</h2>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 无窗口运行一次（对所有已启用目录执行压缩，完成后退出）</span></span><br><span class="line">autocompress.exe --run-once</span><br></pre></td></tr></table></figure>
+<p>这个模式可以配合 [[scheduleCenter]] 之类的定时任务工具做更灵活的调度。</p>
+<h2 id="命名说明">命名说明</h2>
+<p>项目名称为 <strong>AutoVideoCompressor</strong>。代码内部的包名（<code>autocompress</code>）、产品显示名（<code>AutoCompress</code>）、配置目录（<code>%APPDATA%/AutoCompress</code>）等都是历史遗留的内部标识符，与实际代码保持一致，不代表项目名称变更。</p>
+<h2 id="许可">许可</h2>
+<p>MIT</p>
+]]></content>
+      <categories>
+        <category>项目介绍</category>
+      </categories>
+      <tags>
+        <tag>Tauri</tag>
+        <tag>Rust</tag>
+        <tag>Vue</tag>
+        <tag>ffmpeg</tag>
+        <tag>视频压缩</tag>
+        <tag>桌面工具</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MaskForge — SillyTavern 角色卡生成与编辑工具</title>
+    <url>/posts/MaskForge-SillyTavern%E8%A7%92%E8%89%B2%E5%8D%A1%E5%B7%A5%E5%85%B7/</url>
+    <content><![CDATA[<h2 id="项目简介">项目简介</h2>
+<p><strong>MaskForge</strong> 是一个 <a href="https://docs.sillytavern.app/">SillyTavern</a> 角色卡（Character Card V3 schema）生成、修改、编辑工具。它作为 <a href="https://pi.dev">Pi Coding Agent</a> 的 skill 发布，让你可以用自然语言驱动 AI 来创建和编辑角色卡。</p>
+<ul>
+<li>仓库地址：<a href="https://github.com/guyu-guyu/MaskForge">https://github.com/guyu-guyu/MaskForge</a></li>
+<li>主要语言：JavaScript</li>
+<li>Skill 名称：<code>maskforge</code></li>
+</ul>
+<h2 id="为什么做这个">为什么做这个</h2>
+<p>SillyTavern 是流行的 AI 角色扮演前端，角色卡是它的核心载体。但手写角色卡有几个痛点：</p>
+<ul>
+<li>角色卡是 <strong>PNG 图片 + 嵌入 JSON 元数据</strong> 的特殊格式，纯文本编辑器没法直接操作</li>
+<li>V3 schema 字段繁多（描述、人设、对话示例、世界观、扩展字段……），手写容易出错</li>
+<li>想批量生成或修改角色卡时，没有趁手的工具链</li>
+</ul>
+<p>MaskForge 把角色卡的创建/编辑做成 Pi 的 skill，让 AI 理解 schema、按规范生成、并打包成可导入 SillyTavern 的 PNG 文件。</p>
+<h2 id="项目结构">项目结构</h2>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">MaskForge/</span><br><span class="line">├── SKILL.md              # skill 入口（Pi 读取的技能说明）</span><br><span class="line">├── package.json          # 依赖管理（png-chunks-* 系列）</span><br><span class="line">├── schemas/              # SillyTavern 角色卡 V3 schema</span><br><span class="line">├── scripts/              # PNG 角色卡操作脚本</span><br><span class="line">│   ├── pack.js           # 把 JSON 元数据打包进 PNG</span><br><span class="line">│   ├── unpack.js         # 从 PNG 提取角色卡 JSON</span><br><span class="line">│   ├── cover.js          # 替换/修改 PNG 封面</span><br><span class="line">│   ├── describe.js       # 描述 schema 字段</span><br><span class="line">│   ├── generate.js       # 生成角色卡 JSON</span><br><span class="line">│   └── validate.js       # 校验角色卡是否符合 schema</span><br><span class="line">└── references/</span><br><span class="line">    └── schema-guide.md   # 字段速查手册</span><br></pre></td></tr></table></figure>
+<h2 id="核心能力">核心能力</h2>
+<h3 id="PNG-角色卡操作">PNG 角色卡操作</h3>
+<p>SillyTavern 的角色卡是 PNG 图片，角色数据以 <a href="https://en.wikipedia.org/wiki/PNG_metadata">PNG tEXt chunk</a> 的形式嵌入。MaskForge 提供三个脚本来操作这套格式：</p>
+<ul>
+<li><strong><code>pack.js</code></strong> — 把角色 JSON 元数据打包进 PNG 图片，生成可导入 SillyTavern 的角色卡</li>
+<li><strong><code>unpack.js</code></strong> — 从 PNG 角色卡提取出 JSON 元数据，便于查看和修改</li>
+<li><strong><code>cover.js</code></strong> — 替换或修改角色卡的 PNG 封面图</li>
+</ul>
+<p>底层依赖 <code>png-chunks-encode</code> / <code>png-chunks-extract</code> / <code>png-chunks-parse</code> 系列库来读写 PNG chunk。</p>
+<h3 id="Schema-驱动的生成与校验">Schema 驱动的生成与校验</h3>
+<ul>
+<li><strong><code>describe.js</code></strong> — 描述 SillyTavern V3 schema 的字段含义，帮助 AI 理解每个字段该填什么</li>
+<li><strong><code>generate.js</code></strong> — 按 schema 生成角色卡 JSON</li>
+<li><strong><code>validate.js</code></strong> — 校验生成的角色卡是否符合 V3 schema</li>
+</ul>
+<p>支持用简写名引用 schema（如 <code>v3</code>、<code>character</code>），不必记完整文件路径。</p>
+<h3 id="字段速查手册">字段速查手册</h3>
+<p><code>references/schema-guide.md</code> 是一份字段速查手册，写角色卡时不用反复翻 SillyTavern 的官方文档。</p>
+<h2 id="使用方式">使用方式</h2>
+<p>MaskForge 是 Pi 的 skill，装上之后 Pi 就能用自然语言驱动它。典型场景：</p>
+<ul>
+<li>“帮我生成一个赛博朋克侦探角色卡”</li>
+<li>“把这个角色卡的描述改得更口语化”</li>
+<li>“从这张 PNG 提取角色数据，把人设字段翻译成英文”</li>
+<li>“校验这个角色卡是否符合 V3 schema”</li>
+</ul>
+<p>底层调用的是上面那些脚本，AI 负责理解意图和填字段。</p>
+<h2 id="在-guyu-skills-中">在 guyu-skills 中</h2>
+<p>MaskForge 同时也收录在 <a   href='/posts/guyu-skills-我的Pi技能集合/'>guyu-skills-我的Pi技能集合</a> 中，作为目前唯一已发布的 skill。</p>
+<h2 id="许可">许可</h2>
+<p>MIT</p>
+]]></content>
+      <categories>
+        <category>项目介绍</category>
+      </categories>
+      <tags>
+        <tag>JavaScript</tag>
+        <tag>SillyTavern</tag>
+        <tag>角色卡</tag>
+        <tag>AI</tag>
+        <tag>Skill</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>beeimg-uploader — Obsidian 蜜蜂图床上传插件</title>
+    <url>/posts/beeimg-uploader-Obsidian%E8%9C%9C%E8%9C%82%E5%9B%BE%E5%BA%8A%E4%B8%8A%E4%BC%A0%E6%8F%92%E4%BB%B6/</url>
+    <content><![CDATA[<h2 id="项目简介">项目简介</h2>
+<p><strong>beeimg-uploader</strong> 是一个 <a href="https://obsidian.md/">Obsidian</a> 插件，在粘贴或拖拽图片时自动上传到 <a href="https://www.beeimg.cn/">蜜蜂图床</a>（基于 Lsky Pro），并把文档中的图片链接替换为图床外链。</p>
+<ul>
+<li>仓库地址：<a href="https://github.com/guyu-guyu/beeimg-uploader">https://github.com/guyu-guyu/beeimg-uploader</a></li>
+<li>主要语言：TypeScript</li>
+<li>当前版本：1.0.2</li>
+</ul>
+<h2 id="为什么做这个">为什么做这个</h2>
+<p>用 Obsidian 写笔记的时候，图片管理一直是个麻烦事：</p>
+<ul>
+<li>图片存在 vault 里会让仓库越来越大，同步变慢</li>
+<li>手动一张张传到图床再贴链接太打断思路</li>
+<li>想要图床外链（发到博客、分享给别人）就得二次操作</li>
+</ul>
+<p>这个插件把上传流程自动化——<strong>Ctrl+V 的瞬间，图片直接飞到图床，文档里留下的是外链</strong>。</p>
+<h2 id="核心功能">核心功能</h2>
+<ul>
+<li><strong>粘贴自动上传</strong> —— 在 Markdown 编辑器里 Ctrl+V 粘贴图片，直接上传到蜜蜂图床，插入 <code>![文件名](图床链接)</code></li>
+<li><strong>拖拽自动上传</strong> —— 拖入图片文件自动上传，支持多图</li>
+<li><strong>手动上传剪贴板</strong> —— 命令面板搜「上传剪贴板中的图片到蜜蜂图床」</li>
+<li><strong>批量上传本地图片</strong> —— 命令「上传当前文档中的所有本地图片到蜜蜂图床」，扫描 <code>![xxx](/images/xxx.png)</code> 和 <code>![](path)</code> 本地引用，上传后原地替换为图床链接</li>
+<li><strong>占位符策略</strong> —— 上传中先插入 <code>![正在上传…](#beeimg-xxx)</code>，成功替换为链接，失败替换为 HTML 注释，不丢失上下文</li>
+<li><strong>两种认证模式</strong> —— API Token（推荐）或账号密码自动登录</li>
+<li><strong>设置面板内置诊断</strong> —— 「测试连接」「查询策略」「查询相册」按钮，一键排查配置问题</li>
+</ul>
+<h2 id="安装">安装</h2>
+<h3 id="方式一：手动安装">方式一：手动安装</h3>
+<ol>
+<li>从 <a href="https://github.com/guyu-guyu/beeimg-uploader/releases">Releases</a> 下载最新版的 <code>beeimg-uploader-x.y.z.zip</code></li>
+<li>解压得到 <code>manifest.json</code>、<code>main.js</code>、<code>styles.css</code> 三个文件</li>
+<li>在你的 vault 中创建目录 <code>.obsidian/plugins/beeimg-uploader/</code></li>
+<li>把三个文件放入该目录</li>
+<li>打开 Obsidian → 设置 → 第三方插件 → 关闭安全模式</li>
+<li>在已安装插件列表中找到「BeeImg 蜜蜂图床上传」并启用</li>
+</ol>
+<h3 id="方式二：通过-BRAT-安装">方式二：通过 BRAT 安装</h3>
+<p>Releases 里同时附带了 <code>main.js</code>、<code>manifest.json</code>、<code>styles.css</code> 三个单独文件，可被 <a href="https://github.com/TfTHacker/obsidian42-brat">BRAT</a> 等 Obsidian 插件管理器直接识别：</p>
+<ol>
+<li>安装 BRAT 插件</li>
+<li>BRAT → Add Beta plugin → 填入 <code>https://github.com/guyu-guyu/beeimg-uploader</code></li>
+<li>BRAT 会自动拉取最新 Release 的三个文件并安装</li>
+</ol>
+<h2 id="配置">配置</h2>
+<p>启用插件后，在设置里配置：</p>
+<ol>
+<li><strong>API 基地址</strong> —— 默认 <code>https://www.beeimg.cn</code>，一般不用改</li>
+<li><strong>认证方式</strong>：
+<ul>
+<li><strong>API Token（推荐）</strong> —— 到蜜蜂图床「个人设置 → API Token」创建一个持久令牌，<strong>完整复制</strong>（含数字前缀和竖线，如 <code>5|ll0yN65FmPPPur9...</code>）填入。注意：<strong>临时上传 Token 不能用于此插件</strong>。</li>
+<li><strong>账号密码</strong> —— 填入用户名/邮箱/手机号 + 密码，插件自动登录获取 token 并缓存，遇到 401 自动重新登录。</li>
+</ul>
+</li>
+<li><strong>储存策略 ID</strong> —— 默认 <code>4</code>（蜜蜂图床目前只有 ID=4 的 <code>TEMP</code> 策略）。如不确定点「查询策略」按钮。</li>
+<li><strong>相册 ID</strong> —— 填 <code>0</code> 表示不上传到任何相册（插件会省略该字段）；想归入相册则点「查询相册」查看合法 ID。</li>
+<li>点「测试」按钮验证配置，显示 <code>✓ 连接成功：你的用户名</code> 即可。</li>
+</ol>
+<h2 id="使用">使用</h2>
+<h3 id="粘贴图片">粘贴图片</h3>
+<p>直接在 Markdown 编辑器里 Ctrl+V，图片不会保存到 vault，直接上传后插入图床链接。</p>
+<h3 id="拖拽图片">拖拽图片</h3>
+<p>把图片文件拖到编辑器，自动上传并插入。</p>
+<h3 id="批量上传本地图片">批量上传本地图片</h3>
+<p>打开含本地图片引用的文档，命令面板执行「上传当前文档中的所有本地图片到蜜蜂图床」，插件会扫描：</p>
+<ul>
+<li>Obsidian wikilink 格式：<code>![xxx](/images/xxx.png)</code></li>
+<li>标准 markdown 本地引用：<code>![](相对路径.png)</code></li>
+</ul>
+<p>逐张上传后原地替换为图床链接。</p>
+<h2 id="技术要点">技术要点</h2>
+<p>开发这个插件踩了几个值得记录的坑：</p>
+<ul>
+<li><strong>手动构造 multipart/form-data</strong> —— Obsidian 的 <code>requestUrl</code> 对 multipart 上传有限制，绕过它需要手动构造请求体</li>
+<li><strong>统一 <code>/api/v1</code> 前缀</strong> —— Lsky Pro 旧版接口的路径约定</li>
+<li><strong>兼容两种 envelope</strong> —— 接口返回的 <code>status</code> 字段既可能是 <code>true</code> 也可能是 <code>&quot;success&quot;</code>，两种都要处理</li>
+<li><strong>上传失败时自动查询策略列表</strong> —— 辅助诊断「储存策略 ID 填错」这类常见问题</li>
+</ul>
+<h2 id="故障排查">故障排查</h2>
+<table>
+<thead>
+<tr>
+<th>现象</th>
+<th>原因与解决</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Unexpected token '&lt;'</code></td>
+<td>baseUrl 配错或路径返回了 HTML。确认 baseUrl 是 <code>https://www.beeimg.cn</code></td>
+</tr>
+<tr>
+<td><code>Token 无效（Unauthenticated）</code></td>
+<td>token 复制不完整或用了临时上传 Token。重新到「个人设置 → API Token」创建并完整复制</td>
+</tr>
+<tr>
+<td><code>服务异常，请稍后再试</code></td>
+<td><strong>储存策略 ID 填错</strong>。点「查询策略」确认正确 ID（蜜蜂图床通常是 4）</td>
+</tr>
+<tr>
+<td><code>相册不存在</code></td>
+<td>相册 ID 填了不存在的值。填 0（省略字段）或点「查询相册」选合法 ID</td>
+</tr>
+<tr>
+<td>粘贴无反应</td>
+<td>检查设置里「粘贴时自动上传」是否开启；确认插件已启用</td>
+</tr>
+</tbody>
+</table>
+<h2 id="许可">许可</h2>
+<p>MIT</p>
+]]></content>
+      <categories>
+        <category>项目介绍</category>
+      </categories>
+      <tags>
+        <tag>TypeScript</tag>
+        <tag>Obsidian</tag>
+        <tag>图床</tag>
+        <tag>Lsky Pro</tag>
+        <tag>插件</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>guyu-bucket — 自用 Scoop Bucket</title>
+    <url>/posts/guyu-bucket-%E8%87%AA%E7%94%A8Scoop-Bucket/</url>
+    <content><![CDATA[<h2 id="项目简介">项目简介</h2>
+<p><strong>guyu-bucket</strong> 是我个人维护的 <a href="https://scoop.sh">Scoop</a> bucket，收录我自己维护和常用的应用清单（manifest）。</p>
+<ul>
+<li>仓库地址：<a href="https://github.com/guyu-guyu/guyu-bucket">https://github.com/guyu-guyu/guyu-bucket</a></li>
+</ul>
+<h2 id="为什么做这个">为什么做这个</h2>
+<p><a href="https://scoop.sh">Scoop</a> 是 Windows 上流行的命令行包管理器，主打便携、用户级安装、不污染系统。它用 “bucket”（仓库）来组织应用清单——你可以把它理解成类似 Homebrew 的 tap。</p>
+<p>我自己写的桌面工具如果要手动分发安装包，用户得自己去 Releases 页面下载、解压、放目录、加 PATH，体验很差。把它们做成 Scoop manifest 之后，用户一条命令就能装好：</p>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">scoop install guyu<span class="literal">-bucket</span>/autovideocompressor</span><br></pre></td></tr></table></figure>
+<p>升级也是一条命令：<code>scoop update autovideocompressor</code>。</p>
+<h2 id="使用方法">使用方法</h2>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 添加此 bucket</span></span><br><span class="line">scoop bucket add guyu<span class="literal">-bucket</span> https://github.com/guyu<span class="literal">-guyu</span>/guyu<span class="literal">-bucket</span>.git</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装应用</span></span><br><span class="line">scoop install guyu<span class="literal">-bucket</span>/&lt;app<span class="literal">-name</span>&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="目录结构">目录结构</h2>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">bucket/       # 应用 manifest 文件（JSON）</span><br><span class="line">README.md     # 本文件</span><br></pre></td></tr></table></figure>
+<p>每个应用对应 <code>bucket/</code> 下的一个 JSON manifest 文件，定义下载地址、校验值、安装方式、环境变量等。</p>
+<h2 id="收录的应用">收录的应用</h2>
+<table>
+<thead>
+<tr>
+<th>应用</th>
+<th>描述</th>
+<th>版本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/guyu-guyu/AutoVideoCompressor">autovideocompressor</a></td>
+<td>视频素材定时压缩工具 — 自动扫描目录、调用 ffmpeg 压缩、支持 Per-directory 配置和 cron 调度</td>
+<td>0.2.1</td>
+</tr>
+<tr>
+<td><a href="https://github.com/guyu-guyu/scheduleCenter">schedulecenter</a></td>
+<td>Windows 定时任务管理中心 — WPF GUI + CLI 双模式，管理 Windows 任务计划程序</td>
+<td>0.1.1</td>
+</tr>
+</tbody>
+</table>
+<p>详细介绍可以看各自的项目介绍文：</p>
+<ul>
+<li><a   href='/posts/AutoVideoCompressor-视频素材定时压缩工具/'>AutoVideoCompressor-视频素材定时压缩工具</a></li>
+<li><a   href='/posts/scheduleCenter-Windows定时任务管理中心/'>scheduleCenter-Windows定时任务管理中心</a></li>
+</ul>
+<h2 id="与自研工具的协同">与自研工具的协同</h2>
+<p>这个 bucket 主要是给我自己发布的桌面工具做分发渠道。流程大致是：</p>
+<ol>
+<li>在 <a   href='/posts/AutoVideoCompressor-视频素材定时压缩工具/'>AutoVideoCompressor-视频素材定时压缩工具</a> 或 <a   href='/posts/scheduleCenter-Windows定时任务管理中心/'>scheduleCenter-Windows定时任务管理中心</a> 仓库打 tag、发 Release</li>
+<li>在 guyu-bucket 更新对应 manifest 的版本号、下载 URL、hash</li>
+<li>用户 <code>scoop update</code> 后就能拉到新版本</li>
+</ol>
+<h2 id="许可">许可</h2>
+<p>MIT</p>
+]]></content>
+      <categories>
+        <category>项目介绍</category>
+      </categories>
+      <tags>
+        <tag>Scoop</tag>
+        <tag>Windows</tag>
+        <tag>包管理</tag>
+        <tag>CLI</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>guyu-skills — 我的 Pi 技能集合</title>
+    <url>/posts/guyu-skills-%E6%88%91%E7%9A%84Pi%E6%8A%80%E8%83%BD%E9%9B%86%E5%90%88/</url>
+    <content><![CDATA[<h2 id="项目简介">项目简介</h2>
+<p><strong>guyu-skills</strong> 是我个人维护的 <a href="https://pi.dev">Pi Coding Agent</a> skill 集合，作为各种 skill 的统一发布仓库。</p>
+<ul>
+<li>仓库地址：<a href="https://github.com/guyu-guyu/guyu-skills">https://github.com/guyu-guyu/guyu-skills</a></li>
+<li>主要语言：JavaScript</li>
+<li>当前收录：<a   href='/posts/MaskForge-SillyTavern角色卡工具/'>MaskForge-SillyTavern角色卡工具</a></li>
+</ul>
+<h2 id="为什么单独建一个仓库">为什么单独建一个仓库</h2>
+<p>Pi 的 skill 可以单独发布成仓库，也可以集中到一个 “skills 集合” 仓库里。单独建一个 guyu-skills 仓库有几个好处：</p>
+<ul>
+<li><strong>统一入口</strong> —— 别人（或未来的我）想装我所有的 skill，只要知道这一个仓库地址</li>
+<li><strong>降低开销</strong> —— 每个 skill 单独建仓库要有 README、CI、release 配置，小 skill 没必要</li>
+<li><strong>版本同步</strong> —— 多个 skill 之间若有共享约定（命名、目录结构），放一起更容易保持一致</li>
+</ul>
+<h2 id="目录结构">目录结构</h2>
+<p>每个 skill 是仓库根目录下的一个子目录，目录名即 skill 名：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">guyu-skills/</span><br><span class="line">└── MaskForge/        # SillyTavern 角色卡生成/编辑 skill</span><br><span class="line">    ├── SKILL.md</span><br><span class="line">    ├── package.json</span><br><span class="line">    ├── schemas/</span><br><span class="line">    ├── scripts/</span><br><span class="line">    └── references/</span><br></pre></td></tr></table></figure>
+<h2 id="当前收录">当前收录</h2>
+<h3 id="MaskForge">MaskForge</h3>
+<p>SillyTavern 角色卡（V3 schema）生成、修改、编辑工具。提供 PNG 角色卡打包/解包、字段描述、生成与校验脚本。</p>
+<p>详细介绍见 <a   href='/posts/MaskForge-SillyTavern角色卡工具/'>MaskForge-SillyTavern角色卡工具</a>。</p>
+<h2 id="使用方式">使用方式</h2>
+<p>Pi 支持从 git 仓库安装 skill。具体安装命令参考 Pi 官方文档，大致形式是：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">pi install git:github.com/guyu-guyu/guyu-skills</span><br></pre></td></tr></table></figure>
+<p>或在项目级配置里把整个仓库作为 skill 源，再按需启用其中的子目录。</p>
+<h2 id="与其他项目的关系">与其他项目的关系</h2>
+<p>guyu-skills 里的 skill 可以配合 <a   href='/posts/pi-isolate-以隔离模式运行pi的命令/'>pi-isolate-以隔离模式运行pi的命令</a> 使用——在隔离环境里按需 <code>--add-skill</code> 把某个 skill 从全局拣选到当前项目，保持项目环境的纯净。</p>
+<h2 id="后续计划">后续计划</h2>
+<p>仓库目前只有 MaskForge 一个 skill，后续会陆续把其他自用 skill 整理进来。</p>
+<h2 id="许可">许可</h2>
+<p>MIT（各 skill 可能有自己的许可声明，以子目录为准）</p>
+]]></content>
+      <categories>
+        <category>项目介绍</category>
+      </categories>
+      <tags>
+        <tag>JavaScript</tag>
+        <tag>AI</tag>
+        <tag>Skills</tag>
+        <tag>Pi</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>novelForgePi — 把 Pi 改造成小说写作工具</title>
+    <url>/posts/novelForgePi-%E6%8A%8APi%E6%94%B9%E9%80%A0%E6%88%90%E5%B0%8F%E8%AF%B4%E5%86%99%E4%BD%9C%E5%B7%A5%E5%85%B7/</url>
+    <content><![CDATA[<h2 id="项目简介">项目简介</h2>
+<p><strong>novelForgePi</strong> 把 <a href="https://pi.dev">Pi Coding Agent</a> 改造为中文网文写作辅助工具。它是一组 Pi 的扩展（packages + skills + slash commands），装上之后 Pi 就能帮你开新书、规划大纲、写场景、做一致性审计。</p>
+<ul>
+<li>仓库地址：<a href="https://github.com/guyu-guyu/novelForgePi">https://github.com/guyu-guyu/novelForgePi</a></li>
+<li>主要语言：TypeScript</li>
+<li>安装方式：<code>pi install git:github.com/guyu-guyu/novelForgePi</code></li>
+</ul>
+<h2 id="为什么做这个">为什么做这个</h2>
+<p>通用 AI Coding Agent 写小说有几个痛点：</p>
+<ul>
+<li>不知道怎么组织一本长篇小说的文件结构</li>
+<li>没有章节、场景、设定集这些概念</li>
+<li>写长文容易人设崩坏、前后矛盾</li>
+<li>写出来的东西一股「AI 翻译腔」</li>
+</ul>
+<p>novelForgePi 想解决的就是这些问题——给 Pi 一套写作领域的原子工具和技能，让它像个懂网文的助手一样工作。</p>
+<h2 id="快速开始">快速开始</h2>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">pi install git:github.com/guyu-guyu/novelForgePi</span><br><span class="line"></span><br><span class="line"><span class="built_in">mkdir</span> my-novel &amp;&amp; <span class="built_in">cd</span> my-novel</span><br><span class="line">pi</span><br><span class="line">&gt; /new-book          <span class="comment"># 初始化骨架</span></span><br><span class="line">&gt; /outline           <span class="comment"># 规划大纲</span></span><br><span class="line">&gt; /new-chapter       <span class="comment"># 新建章</span></span><br><span class="line">&gt; /new-scene         <span class="comment"># 新建场景</span></span><br><span class="line">&gt; /write             <span class="comment"># 续写</span></span><br></pre></td></tr></table></figure>
+<h2 id="概览">概览</h2>
+<ul>
+<li><strong>32 个原子文件工具</strong>（scene / chapter / codex / character / outline / ctx / stats）</li>
+<li><strong>8 个写作技能</strong>（scene-writing / polishing、consistency-audit、outline-planning、character-*、codex-management、prompt-pack-generator）</li>
+<li><strong>19 个斜杠命令</strong>模板</li>
+<li><strong>内置 cn-webnovel 题材包</strong>（风格总纲 + 续写/润色指令 + 一致性规则 + 示例片段）</li>
+<li><strong>Obsidian 兼容</strong>：YAML frontmatter + <code>[[wiki-links]]</code> + 全局唯一文件名</li>
+<li><strong>16 个测试</strong>（单元 + 集成）通过</li>
+</ul>
+<h2 id="设计思路">设计思路</h2>
+<h3 id="原子工具而非大命令">原子工具而非大命令</h3>
+<p>没有把「写一章小说」做成一个大命令，而是拆成 32 个原子文件工具（创建场景、读取章节、更新设定集……）。这样可以灵活组合，也让 Agent 的每一步操作都可观察、可干预。</p>
+<h3 id="Obsidian-兼容">Obsidian 兼容</h3>
+<p>所有文件都用 YAML frontmatter + <code>[[wiki-links]]</code>，文件名全局唯一。这意味着你可以直接用 Obsidian 打开小说项目，双链在 Obsidian 里照样能跳转，传统笔记工作流和 AI 写作工作流可以无缝衔接。</p>
+<h3 id="题材包机制">题材包机制</h3>
+<p>内置的 <code>cn-webnovel</code> 题材包是一组可替换的「风格总纲 + 续写/润色指令 + 一致性规则 + 示例片段」。不同题材（玄幻、都市、科幻……）可以做成不同的题材包，切换题材不用改工具本身。</p>
+<h3 id="一致性审计">一致性审计</h3>
+<p><code>consistency-audit</code> 技能会扫描已写的章节，对照设定集（角色、世界观、物品）找出前后矛盾的地方。长篇小说写到 50 万字的时候，这个功能救命。</p>
+<h2 id="文档">文档</h2>
+<ul>
+<li><a href="https://github.com/guyu-guyu/novelForgePi/blob/main/docs/usage.md">使用指南</a> — 安装、开新书、写作工作流、题材包、常见问题</li>
+<li><a href="https://github.com/guyu-guyu/novelForgePi/blob/main/docs/architecture.md">代码架构</a> — 目录结构、核心抽象、扩展生命周期、技术栈</li>
+<li><a href="https://github.com/guyu-guyu/novelForgePi/blob/main/docs/roadmap.md">v2 路线图</a> — 已知局限、规划方向</li>
+</ul>
+<h2 id="与-pi-isolate-的配合">与 pi-isolate 的配合</h2>
+<p>novelForgePi 的 <code>/new-book</code> 命令会在书项目里建好 <code>.pi-isolated/</code> 并 symlink novelForgePi 包，然后提示你退出 pi 跑 <a   href='/posts/pi-isolate-以隔离模式运行pi的命令/'>pi-isolate-以隔离模式运行pi的命令</a>。两者职责分离：</p>
+<table>
+<thead>
+<tr>
+<th>工具</th>
+<th>职责</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pi-isolate</code></td>
+<td>通用隔离启动：symlink 凭证 + 生成 settings.json + exec pi</td>
+</tr>
+<tr>
+<td>novelForgePi <code>/new-book</code></td>
+<td>novelForgePi 特有：建书骨架 + symlink novelForgePi 包到 <code>.pi-isolated/git/...</code></td>
+</tr>
+</tbody>
+</table>
+<p>这样每本小说都是一个独立的隔离环境，互不污染。</p>
+<h2 id="许可">许可</h2>
+<p>MIT</p>
+]]></content>
+      <categories>
+        <category>项目介绍</category>
+      </categories>
+      <tags>
+        <tag>TypeScript</tag>
+        <tag>Obsidian</tag>
+        <tag>Pi</tag>
+        <tag>AI写作</tag>
+        <tag>小说</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>pi-isolate — 以隔离模式运行 Pi 的命令</title>
+    <url>/posts/pi-isolate-%E4%BB%A5%E9%9A%94%E7%A6%BB%E6%A8%A1%E5%BC%8F%E8%BF%90%E8%A1%8Cpi%E7%9A%84%E5%91%BD%E4%BB%A4/</url>
+    <content><![CDATA[<h2 id="项目简介">项目简介</h2>
+<p><strong>pi-isolate</strong> 是一个全局命令，让你在任意目录以 <strong>项目级隔离配置</strong> 运行 <a href="https://pi.dev">Pi Coding Agent</a>。</p>
+<ul>
+<li>仓库地址：<a href="https://github.com/guyu-guyu/pi-isolate">https://github.com/guyu-guyu/pi-isolate</a></li>
+<li>主要语言：JavaScript (Node.js ≥ 18)</li>
+<li>安装：<code>npm install -g github:guyu-guyu/pi-isolate</code></li>
+</ul>
+<h2 id="解决什么问题">解决什么问题</h2>
+<p>默认情况下 Pi 读取全局配置 <code>~/.pi/agent/</code>（包含所有包、扩展、技能、凭证等）。在多个项目间切换时会有几个头疼的问题：</p>
+<ul>
+<li>全局 <code>packages</code> 字段会把所有装过的包都加载进来，<strong>无法按项目隔离</strong></li>
+<li><code>auth.json</code> 含 API key，直接复制到项目目录有<strong>泄露风险</strong>（误 <code>git add</code> 就完了）</li>
+<li>手写隔离脚本每个项目都要拷一份，<strong>更新成本高</strong></li>
+</ul>
+<p><code>pi-isolate</code> 把隔离启动做成一个全局命令：任意目录跑 <code>pi-isolate</code> 就能以隔离模式启动 Pi。</p>
+<h2 id="使用">使用</h2>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> my-project</span><br><span class="line">pi-isolate                <span class="comment"># 以隔离模式启动 pi（等同 pi --approve）</span></span><br><span class="line">pi-isolate -e npm:foo     <span class="comment"># 透传 -e 给 pi（临时扩展）</span></span><br><span class="line">pi-isolate -- --<span class="built_in">help</span>      <span class="comment"># 透传 --help 给 pi（见下文）</span></span><br><span class="line">pi-isolate --<span class="built_in">help</span>         <span class="comment"># 显示 pi-isolate 自身帮助</span></span><br><span class="line">pi-isolate --version      <span class="comment"># 显示版本</span></span><br><span class="line">pi-isolate --pick         <span class="comment"># 进入 TUI 勾选资源（空格切换、回车应用）</span></span><br></pre></td></tr></table></figure>
+<p><strong>参数分类</strong>：pi-isolate 识别自己的 flag（见下表），其余参数原样透传给 <code>pi --approve</code>。要强制透传（比如把 <code>--help</code> 传给 pi），用 <code>--</code> 分隔：<code>pi-isolate -- --help</code>。</p>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>行为</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-h</code> / <code>--help</code></td>
+<td>显示 pi-isolate 帮助并退出</td>
+</tr>
+<tr>
+<td><code>-V</code> / <code>--version</code></td>
+<td>显示版本并退出</td>
+</tr>
+<tr>
+<td><code>--list</code></td>
+<td>列出全局已装的 packages / extensions / skills，标记已被拣选的</td>
+</tr>
+<tr>
+<td><code>--pick</code></td>
+<td>进入简易 TUI：↑↓/jk 移动、Space 勾选/取消、Enter 应用、q/Esc 取消</td>
+</tr>
+<tr>
+<td><code>--add-package &lt;spec&gt;</code></td>
+<td>从全局拣选一个 package 到隔离目录</td>
+</tr>
+<tr>
+<td><code>--remove-package &lt;spec&gt;</code></td>
+<td>移除已拣选的 package</td>
+</tr>
+<tr>
+<td><code>--add-extension &lt;name&gt;</code></td>
+<td>从全局拣选一个 extension</td>
+</tr>
+<tr>
+<td><code>--remove-extension &lt;name&gt;</code></td>
+<td>移除已拣选的 extension</td>
+</tr>
+<tr>
+<td><code>--add-skill &lt;name&gt;</code></td>
+<td>从全局拣选一个 skill</td>
+</tr>
+<tr>
+<td><code>--remove-skill &lt;name&gt;</code></td>
+<td>移除已拣选的 skill</td>
+</tr>
+</tbody>
+</table>
+<h2 id="资源拣选">资源拣选</h2>
+<p>默认生成的 <code>settings.json</code> <strong>不带</strong> <code>packages</code> / <code>extensions</code> / <code>skills</code>，避免全局资源泄入隔离环境。需要某个资源时，用 <code>--add-*</code> 把它从全局&quot;拣选&quot;到 <code>.pi-isolated/</code>：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">pi-isolate --add-package npm:pi-vim</span><br><span class="line">pi-isolate --add-package git:github.com/obra/superpowers</span><br><span class="line">pi-isolate --add-extension git-ai</span><br><span class="line">pi-isolate --add-skill brave-search</span><br></pre></td></tr></table></figure>
+<p><strong>机制</strong>：</p>
+<ul>
+<li><strong>packages</strong>：当 <code>settings.json</code> 的 <code>packages</code> 非空时，把全局的 <code>npm/</code> 和 <code>git/</code> 目录 <strong>整体 symlink</strong> 到 <code>.pi-isolated/</code>。这样 Pi 启动时能在磁盘上找到所有引用的包及其传递依赖，<strong>不会触发重装</strong>。最后一个包被移除后 symlink 自动删除。</li>
+<li><strong>extensions / skills</strong>：以单个 symlink 方式链入 <code>.pi-isolated/</code>（避免整目录 symlink 触发 Pi 的扩展自动发现）。</li>
+</ul>
+<p>所有资源在 <code>settings.json</code> 对应字段登记，与全局保持同步（全局更新即生效）。</p>
+<blockquote>
+<p><strong>为何 packages 整目录、extensions 逐个</strong>：Pi 只加载 <code>settings.json</code> <code>packages</code> 列出的包（不扫描目录），所以整目录 symlink 不会让多余包加载。但 extensions 会从 <code>extensions/</code> 目录 <strong>自动发现</strong>，整目录 symlink 会把全局所有扩展都带进来——所以 extensions 必须逐个 symlink。skills 同理。</p>
+</blockquote>
+<h2 id="它做了什么">它做了什么</h2>
+<p>在当前目录创建 <code>.pi-isolated/</code>，内含：</p>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.gitignore</code></td>
+<td>真实文件</td>
+<td><code>*</code> + <code>!.gitignore</code>，防止目录内任何东西被提交</td>
+</tr>
+<tr>
+<td><code>auth.json</code></td>
+<td>symlink</td>
+<td>指向 <code>~/.pi/agent/auth.json</code>，<strong>不含数据</strong>，误提交也不泄露</td>
+</tr>
+<tr>
+<td><code>models.json</code></td>
+<td>symlink</td>
+<td>指向 <code>~/.pi/agent/models.json</code></td>
+</tr>
+<tr>
+<td><code>settings.json</code></td>
+<td>真实文件</td>
+<td><strong>仅首次生成</strong>，从全局过滤出基础字段；不带 <code>packages</code>/<code>extensions</code>；<code>skills</code> 固定写入 <code>[&quot;!**/.agents/skills/**&quot;]</code> 屏蔽固定路径</td>
+</tr>
+</tbody>
+</table>
+<p>然后设置 <code>PI_CODING_AGENT_DIR=.pi-isolated</code> 并 <code>exec pi --approve &quot;$@&quot;</code>。</p>
+<h2 id="启动检查">启动检查</h2>
+<p>以 launch 模式启动 Pi 前会做两项检查：</p>
+<p><strong>检查 1：npm/ 和 git/ 目录 symlink 一致性</strong> —— 若 <code>packages</code> 非空但对应目录缺失或不再是 symlink，会自动重建；若变成了真实目录（可能是绕过 pi-isolate 跑 <code>pi install</code> 留下的），会提示是否删除改为 symlink。</p>
+<p><strong>检查 2：redirected 与全局的 packages 差异</strong> —— 对比两边 <code>packages</code> 字段，对每个在隔离配置中存在、但在全局中不存在的包，提示三选一：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Package &quot;npm:pi-vim&quot; is in .pi-isolated/settings.json but not in global settings.</span><br><span class="line">  1) Add to global config (~/.pi/agent/settings.json)</span><br><span class="line">  2) Remove from redirected config</span><br><span class="line">  3) Move to project-local config (.pi/settings.json)</span><br><span class="line">Choose [1-3, or Enter to skip]:</span><br></pre></td></tr></table></figure>
+<h2 id="设计要点">设计要点</h2>
+<ul>
+<li><strong>symlink 而非复制</strong> —— <code>auth.json</code> / <code>models.json</code> 是指针，不含真实数据，即使 <code>.pi-isolated/</code> 被误提交也不会泄露凭证。全局改了即生效。</li>
+<li><strong>settings.json 只生成一次</strong> —— 首次从全局过滤复制，之后<strong>不再覆盖</strong>。用户在隔离模式下的 <code>pi config</code> 修改、手动编辑都会保留。要重置直接删 <code>settings.json</code> 再跑一次 <code>pi-isolate</code>。</li>
+<li><strong>不带 packages</strong> —— 首次生成的 <code>settings.json</code> 不含 <code>packages</code> / <code>extensions</code> 字段，需要什么资源用 <code>--add-*</code> 从全局拣选。</li>
+<li><strong>幂等</strong> —— 重复运行安全。symlink 每次重建，settings.json 跳过，.gitignore 缺失才补。</li>
+</ul>
+<h2 id="与-novelForgePi-的配合">与 novelForgePi 的配合</h2>
+<p><a   href='/posts/novelForgePi-把Pi改造成小说写作工具/'>novelForgePi-把Pi改造成小说写作工具</a> 的 <code>/new-book</code> 命令会在书项目里建好 <code>.pi-isolated/</code> 并 symlink novelForgePi 包，然后提示你退出 pi 跑 <code>pi-isolate</code>。典型工作流：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> my-novel &amp;&amp; <span class="built_in">cd</span> my-novel</span><br><span class="line">pi                          <span class="comment"># 进入 pi（用全局配置）</span></span><br><span class="line">&gt; /new-book                 <span class="comment"># novelForgePi 建骨架 + .pi-isolated/ + 包 symlink</span></span><br><span class="line">&gt; /quit                     <span class="comment"># 退出 pi</span></span><br><span class="line">pi-isolate                  <span class="comment"># 以隔离模式重启 pi</span></span><br><span class="line">&gt; /write                    <span class="comment"># 继续写作</span></span><br></pre></td></tr></table></figure>
+<h2 id="安全">安全</h2>
+<ul>
+<li><code>.pi-isolated/.gitignore</code> 会忽略目录内一切（除了自身）</li>
+<li><code>auth.json</code> / <code>models.json</code> 是 symlink，不含数据</li>
+<li><code>settings.json</code> 是过滤后的真实文件，无密钥</li>
+</ul>
+<p><strong>双保险</strong>：即便项目根 <code>.gitignore</code> 没加 <code>.pi-isolated/</code>，目录内的 <code>.gitignore</code> 也会拦住 <code>git add</code>。</p>
+<h2 id="许可">许可</h2>
+<p>MIT</p>
+]]></content>
+      <categories>
+        <category>项目介绍</category>
+      </categories>
+      <tags>
+        <tag>Pi</tag>
+        <tag>Node.js</tag>
+        <tag>隔离</tag>
+        <tag>命令行工具</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>scheduleCenter — Windows 定时任务管理中心</title>
+    <url>/posts/scheduleCenter-Windows%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E7%AE%A1%E7%90%86%E4%B8%AD%E5%BF%83/</url>
+    <content><![CDATA[<h2 id="项目简介">项目简介</h2>
+<p><strong>scheduleCenter</strong> 是一个 Windows 任务计划程序的管理中间件，提供 <strong>WPF GUI 管理界面 + CLI 模式</strong> 两种使用方式。其他程序/脚本可以通过命令行调用它来增删改查 Windows 定时任务，并获得结构化的 JSON 输出。</p>
+<ul>
+<li>仓库地址：<a href="https://github.com/guyu-guyu/scheduleCenter">https://github.com/guyu-guyu/scheduleCenter</a></li>
+<li>主要语言：C# / .NET Framework 4.8</li>
+<li>平台：Windows 10/11</li>
+</ul>
+<h2 id="设计思路">设计思路</h2>
+<p>Windows 自带的任务计划程序功能强大但操作繁琐，命令行工具 <code>schtasks</code> 又不够友好。scheduleCenter 想做的是一层 <strong>受控封装</strong>：</p>
+<ul>
+<li><strong>单 exe 双模式</strong> — 无参数启动 WPF GUI；带参数进入 CLI 模式（JSON 输出 + 退出码）</li>
+<li><strong>文件夹隔离</strong> — 所有任务都创建在 <code>\ScheduleCenter\</code> 文件夹下；系统内置任务不可见、不可操作</li>
+<li><strong>管理员权限</strong> — 清单声明 <code>requireAdministrator</code>，支持 SYSTEM 账户 / 最高权限任务</li>
+<li><strong>零依赖部署</strong> — .NET Framework 4.8 随 Windows 10/11 自带，无需额外安装运行时</li>
+</ul>
+<blockquote>
+<p>这个工具不管理所有 Windows 计划任务——它只管理通过本工具创建的任务（位于 <code>\ScheduleCenter\</code> 文件夹下）。用户在 Windows 自带的「任务计划程序」里仍然能看到这些任务，这是预期行为。</p>
+</blockquote>
+<h2 id="功能特性">功能特性</h2>
+<h3 id="V1-基础功能">V1 基础功能</h3>
+<ul>
+<li>任务的增删改查、启用/禁用、立即运行</li>
+<li><strong>6 种基础触发器</strong>：一次性、每日、每周、每月、启动时、登录时</li>
+<li>运行历史查看（来源：<code>Microsoft-Windows-TaskScheduler/Operational</code> 事件日志）</li>
+<li>GUI 三栏布局：文件夹树 + 任务列表 + 历史标签页（失败事件红色高亮、可筛选）</li>
+<li>「复制等价 CLI 命令」功能（GUI 操作 → 剪贴板 CLI 命令）</li>
+<li>统一错误模型（<code>TaskServiceException</code> + <code>ErrorCode</code> 枚举）</li>
+</ul>
+<h3 id="V2-高级功能">V2 高级功能</h3>
+<ul>
+<li><strong>多触发器组合</strong> — 一个任务可以挂多个触发器（V1 只支持单触发器）</li>
+<li><strong>空闲触发器</strong> — 系统空闲时触发</li>
+<li><strong>事件触发器</strong> — 基于 Windows 事件日志，支持简化参数（日志名/源/事件 ID）或完整 XPath 订阅</li>
+<li><strong>高级条件</strong>：
+<ul>
+<li>执行时间限制（<code>ExecutionTimeLimit</code>）</li>
+<li>使用电池时不启动（<code>DisallowStartIfOnBatteries</code>）</li>
+<li>切换到电池时停止任务（<code>StopIfGoingOnBatteries</code>）</li>
+</ul>
+</li>
+<li><strong>任务 XML 导入/导出</strong> — 基于任务计划程序原生 <code>TaskDefinition.XmlText</code>，单任务粒度</li>
+</ul>
+<h2 id="CLI-用法">CLI 用法</h2>
+<h3 id="子命令一览">子命令一览</h3>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>add</code></td>
+<td>添加新任务</td>
+</tr>
+<tr>
+<td><code>update</code></td>
+<td>更新已有任务（仅修改提供的字段）</td>
+</tr>
+<tr>
+<td><code>delete</code></td>
+<td>删除任务（<code>--force</code> 跳过确认）</td>
+</tr>
+<tr>
+<td><code>get</code></td>
+<td>获取任务详情</td>
+</tr>
+<tr>
+<td><code>list</code></td>
+<td>列出任务（<code>--filter</code> 通配匹配）</td>
+</tr>
+<tr>
+<td><code>enable</code> / <code>disable</code></td>
+<td>启用/禁用任务</td>
+</tr>
+<tr>
+<td><code>run</code></td>
+<td>立即运行任务</td>
+</tr>
+<tr>
+<td><code>history</code></td>
+<td>查看运行历史（<code>--last &lt;N&gt;</code>、<code>--errors-only</code>）</td>
+</tr>
+<tr>
+<td><code>export</code> / <code>import</code></td>
+<td>任务 XML 导出/导入</td>
+</tr>
+<tr>
+<td><code>help</code> / <code>h</code></td>
+<td>显示人类友好的完整帮助</td>
+</tr>
+<tr>
+<td><code>manifest</code></td>
+<td>输出机器可读的 CLI manifest JSON（给 Agent 用）</td>
+</tr>
+</tbody>
+</table>
+<p>所有 <code>--name</code> 都相对于 <code>\ScheduleCenter\</code>，支持子文件夹路径（如 <code>--name &quot;MyApp\Backup&quot;</code>）。</p>
+<h3 id="双轨触发器语法">双轨触发器语法</h3>
+<p><strong>单触发器（V1 兼容）</strong>：<code>--trigger &lt;type&gt;</code> + 对应参数。</p>
+<p><strong>多触发器（V2 新增）</strong>：<code>--triggers-json</code> 或 <code>--triggers-file</code> 传 JSON 数组：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ScheduleCenter.exe add --name Backup --path C:\app.exe ^</span><br><span class="line">  --triggers-json <span class="string">&quot;[&#123;\&quot;kind\&quot;:\&quot;daily\&quot;,\&quot;time\&quot;:\&quot;09:00\&quot;&#125;,&#123;\&quot;kind\&quot;:\&quot;weekly\&quot;,\&quot;time\&quot;:\&quot;10:00\&quot;,\&quot;days\&quot;:[\&quot;MON\&quot;]&#125;]&quot;</span></span><br></pre></td></tr></table></figure>
+<h3 id="输出格式">输出格式</h3>
+<p><strong>成功</strong>（stdout，单行 JSON，退出码 0）：</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;success&quot;</span><span class="punctuation">:</span><span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span><span class="attr">&quot;command&quot;</span><span class="punctuation">:</span><span class="string">&quot;add&quot;</span><span class="punctuation">,</span><span class="attr">&quot;task&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;Backup&quot;</span><span class="punctuation">,</span><span class="attr">&quot;path&quot;</span><span class="punctuation">:</span><span class="string">&quot;C:\\app.exe&quot;</span><span class="punctuation">,</span><span class="attr">&quot;triggers&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="punctuation">&#123;</span><span class="attr">&quot;kind&quot;</span><span class="punctuation">:</span><span class="string">&quot;daily&quot;</span><span class="punctuation">,</span><span class="attr">&quot;time&quot;</span><span class="punctuation">:</span><span class="string">&quot;09:00&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">]</span><span class="punctuation">,</span><span class="attr">&quot;enabled&quot;</span><span class="punctuation">:</span><span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span><span class="attr">&quot;nextRunTime&quot;</span><span class="punctuation">:</span><span class="string">&quot;2026-07-24T09:00:00&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p><strong>失败</strong>（stderr，非零退出码）：</p>
+<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;success&quot;</span><span class="punctuation">:</span><span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span><span class="attr">&quot;command&quot;</span><span class="punctuation">:</span><span class="string">&quot;add&quot;</span><span class="punctuation">,</span><span class="attr">&quot;error&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="attr">&quot;code&quot;</span><span class="punctuation">:</span><span class="string">&quot;TASK_EXISTS&quot;</span><span class="punctuation">,</span><span class="attr">&quot;message&quot;</span><span class="punctuation">:</span><span class="string">&quot;任务 &#x27;Backup&#x27; 已存在&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>退出码约定：<code>0</code> 成功、<code>1</code> 通用错误、<code>2</code> 参数错误、<code>3</code> 权限不足、<code>4</code> 任务不存在、<code>5</code> 任务已存在。</p>
+<h2 id="与其他项目的配合">与其他项目的配合</h2>
+<p>scheduleCenter 是为给其他程序提供定时任务服务而设计的。比如 <a   href='/posts/AutoVideoCompressor-视频素材定时压缩工具/'>AutoVideoCompressor-视频素材定时压缩工具</a> 的 <code>--run-once</code> 模式就可以交给 scheduleCenter 来定时调度，避免每个工具自己实现一套调度逻辑。</p>
+<h2 id="构建">构建</h2>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">dotnet build ScheduleCenter.sln -c Release</span><br></pre></td></tr></table></figure>
+<p>产物路径：<code>src/ScheduleCenter/bin/Release/net48/ScheduleCenter.exe</code></p>
+<p>主要依赖：<a href="https://github.com/dahall/TaskScheduler">TaskScheduler</a> 2.12.2、Newtonsoft.Json 13.0.3。</p>
+<h2 id="测试">测试</h2>
+<p>使用 MSTest + 真实任务计划程序集成测试，需在管理员终端运行：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">dotnet <span class="built_in">test</span> tests/ScheduleCenter.Core.Tests/ScheduleCenter.Core.Tests.csproj</span><br></pre></td></tr></table></figure>
+<p>测试任务全部创建在 <code>\ScheduleCenter\Tests\</code> 子文件夹下，命名 <code>Test_&#123;guid&#125;</code>，用完自动清理。当前 66 个测试通过。</p>
+<h2 id="版本历史">版本历史</h2>
+<table>
+<thead>
+<tr>
+<th>版本</th>
+<th>日期</th>
+<th>摘要</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>V2</strong></td>
+<td>2026-07-24</td>
+<td>高级触发器与条件 + 任务 XML 导入导出。<strong>破坏性变更</strong>：<code>Trigger</code>（单字段）→ <code>Triggers</code>（数组）；CLI JSON 输出 <code>trigger</code> 对象 → <code>triggers</code> 数组；V1 单触发器 CLI 输入语法保留（双轨兼容）</td>
+</tr>
+<tr>
+<td><strong>V1</strong></td>
+<td>2026-07-23</td>
+<td>基础功能：6 种触发器、CRUD、启用/禁用、运行、历史、GUI 管理、CLI JSON 契约</td>
+</tr>
+</tbody>
+</table>
+<h2 id="许可">许可</h2>
+<p>MIT</p>
+]]></content>
+      <categories>
+        <category>项目介绍</category>
+      </categories>
+      <tags>
+        <tag>Windows</tag>
+        <tag>C#</tag>
+        <tag>.NET</tag>
+        <tag>WPF</tag>
+        <tag>定时任务</tag>
+      </tags>
+  </entry>
+</search>
