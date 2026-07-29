@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"guyu-guyu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"flat"},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null,"enable":false},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":100,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="Windows 平台定时任务管理中间件，WPF GUI + CLI 双模式，对 Windows 任务计划程序做受控封装，只管理自己创建的任务，提供 JSON 输出供其他程序调用。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="scheduleCenter — Windows 定时任务管理中心">
+<meta property="og:url" content="https://guyu-guyu.github.io/posts/scheduleCenter-Windows%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E7%AE%A1%E7%90%86%E4%B8%AD%E5%BF%83/">
+<meta property="og:site_name" content="谷雨的博客">
+<meta property="og:description" content="Windows 平台定时任务管理中间件，WPF GUI + CLI 双模式，对 Windows 任务计划程序做受控封装，只管理自己创建的任务，提供 JSON 输出供其他程序调用。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-29T02:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-29T03:40:06.367Z">
+<meta property="article:author" content="guyu-guyu">
+<meta property="article:tag" content="Windows">
+<meta property="article:tag" content="C#">
+<meta property="article:tag" content=".NET">
+<meta property="article:tag" content="WPF">
+<meta property="article:tag" content="定时任务">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://guyu-guyu.github.io/posts/scheduleCenter-Windows%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E7%AE%A1%E7%90%86%E4%B8%AD%E5%BF%83/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://guyu-guyu.github.io/posts/scheduleCenter-Windows%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E7%AE%A1%E7%90%86%E4%B8%AD%E5%BF%83/","path":"posts/scheduleCenter-Windows定时任务管理中心/","title":"scheduleCenter — Windows 定时任务管理中心"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>scheduleCenter — Windows 定时任务管理中心 | 谷雨的博客</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+<link rel="stylesheet" href="/css/obsidian.css">
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+      <img class="custom-logo-image" src="/%5Bobject%20Object%5D" alt="谷雨的博客">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">谷雨的博客</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text"> 项目简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF"><span class="nav-number">2.</span> <span class="nav-text"> 设计思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%9F%E8%83%BD%E7%89%B9%E6%80%A7"><span class="nav-number">3.</span> <span class="nav-text"> 功能特性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#v1-%E5%9F%BA%E7%A1%80%E5%8A%9F%E8%83%BD"><span class="nav-number">3.1.</span> <span class="nav-text"> V1 基础功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#v2-%E9%AB%98%E7%BA%A7%E5%8A%9F%E8%83%BD"><span class="nav-number">3.2.</span> <span class="nav-text"> V2 高级功能</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cli-%E7%94%A8%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text"> CLI 用法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%90%E5%91%BD%E4%BB%A4%E4%B8%80%E8%A7%88"><span class="nav-number">4.1.</span> <span class="nav-text"> 子命令一览</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8C%E8%BD%A8%E8%A7%A6%E5%8F%91%E5%99%A8%E8%AF%AD%E6%B3%95"><span class="nav-number">4.2.</span> <span class="nav-text"> 双轨触发器语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%93%E5%87%BA%E6%A0%BC%E5%BC%8F"><span class="nav-number">4.3.</span> <span class="nav-text"> 输出格式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8E%E5%85%B6%E4%BB%96%E9%A1%B9%E7%9B%AE%E7%9A%84%E9%85%8D%E5%90%88"><span class="nav-number">5.</span> <span class="nav-text"> 与其他项目的配合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%84%E5%BB%BA"><span class="nav-number">6.</span> <span class="nav-text"> 构建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95"><span class="nav-number">7.</span> <span class="nav-text"> 测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%89%88%E6%9C%AC%E5%8E%86%E5%8F%B2"><span class="nav-number">8.</span> <span class="nav-text"> 版本历史</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%B8%E5%8F%AF"><span class="nav-number">9.</span> <span class="nav-text"> 许可</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">guyu-guyu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="cc-license animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdnjs.cloudflare.com/ajax/libs/creativecommons-vocabulary/2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://guyu-guyu.github.io/posts/scheduleCenter-Windows%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E7%AE%A1%E7%90%86%E4%B8%AD%E5%BF%83/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="guyu-guyu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="谷雨的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="scheduleCenter — Windows 定时任务管理中心 | 谷雨的博客">
+      <meta itemprop="description" content="Windows 平台定时任务管理中间件，WPF GUI + CLI 双模式，对 Windows 任务计划程序做受控封装，只管理自己创建的任务，提供 JSON 输出供其他程序调用。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          scheduleCenter — Windows 定时任务管理中心
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2026-07-29 10:00:00 / 修改时间：11:40:06" itemprop="dateCreated datePublished" datetime="2026-07-29T10:00:00+08:00">2026-07-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D/" itemprop="url" rel="index"><span itemprop="name">项目介绍</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">Windows 平台定时任务管理中间件，WPF GUI + CLI 双模式，对 Windows 任务计划程序做受控封装，只管理自己创建的任务，提供 JSON 输出供其他程序调用。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="项目简介"><a class="markdownIt-Anchor" href="#项目简介"></a> 项目简介</h2>
+<p><strong>scheduleCenter</strong> 是一个 Windows 任务计划程序的管理中间件，提供 <strong>WPF GUI 管理界面 + CLI 模式</strong> 两种使用方式。其他程序/脚本可以通过命令行调用它来增删改查 Windows 定时任务，并获得结构化的 JSON 输出。</p>
+<ul>
+<li>仓库地址：<a target="_blank" rel="noopener" href="https://github.com/guyu-guyu/scheduleCenter">https://github.com/guyu-guyu/scheduleCenter</a></li>
+<li>主要语言：C# / .NET Framework 4.8</li>
+<li>平台：Windows 10/11</li>
+</ul>
+<h2 id="设计思路"><a class="markdownIt-Anchor" href="#设计思路"></a> 设计思路</h2>
+<p>Windows 自带的任务计划程序功能强大但操作繁琐，命令行工具 <code>schtasks</code> 又不够友好。scheduleCenter 想做的是一层 <strong>受控封装</strong>：</p>
+<ul>
+<li><strong>单 exe 双模式</strong> — 无参数启动 WPF GUI；带参数进入 CLI 模式（JSON 输出 + 退出码）</li>
+<li><strong>文件夹隔离</strong> — 所有任务都创建在 <code>\ScheduleCenter\</code> 文件夹下；系统内置任务不可见、不可操作</li>
+<li><strong>管理员权限</strong> — 清单声明 <code>requireAdministrator</code>，支持 SYSTEM 账户 / 最高权限任务</li>
+<li><strong>零依赖部署</strong> — .NET Framework 4.8 随 Windows 10/11 自带，无需额外安装运行时</li>
+</ul>
+<blockquote>
+<p>这个工具不管理所有 Windows 计划任务——它只管理通过本工具创建的任务（位于 <code>\ScheduleCenter\</code> 文件夹下）。用户在 Windows 自带的「任务计划程序」里仍然能看到这些任务，这是预期行为。</p>
+</blockquote>
+<h2 id="功能特性"><a class="markdownIt-Anchor" href="#功能特性"></a> 功能特性</h2>
+<h3 id="v1-基础功能"><a class="markdownIt-Anchor" href="#v1-基础功能"></a> V1 基础功能</h3>
+<ul>
+<li>任务的增删改查、启用/禁用、立即运行</li>
+<li><strong>6 种基础触发器</strong>：一次性、每日、每周、每月、启动时、登录时</li>
+<li>运行历史查看（来源：<code>Microsoft-Windows-TaskScheduler/Operational</code> 事件日志）</li>
+<li>GUI 三栏布局：文件夹树 + 任务列表 + 历史标签页（失败事件红色高亮、可筛选）</li>
+<li>「复制等价 CLI 命令」功能（GUI 操作 → 剪贴板 CLI 命令）</li>
+<li>统一错误模型（<code>TaskServiceException</code> + <code>ErrorCode</code> 枚举）</li>
+</ul>
+<h3 id="v2-高级功能"><a class="markdownIt-Anchor" href="#v2-高级功能"></a> V2 高级功能</h3>
+<ul>
+<li><strong>多触发器组合</strong> — 一个任务可以挂多个触发器（V1 只支持单触发器）</li>
+<li><strong>空闲触发器</strong> — 系统空闲时触发</li>
+<li><strong>事件触发器</strong> — 基于 Windows 事件日志，支持简化参数（日志名/源/事件 ID）或完整 XPath 订阅</li>
+<li><strong>高级条件</strong>：
+<ul>
+<li>执行时间限制（<code>ExecutionTimeLimit</code>）</li>
+<li>使用电池时不启动（<code>DisallowStartIfOnBatteries</code>）</li>
+<li>切换到电池时停止任务（<code>StopIfGoingOnBatteries</code>）</li>
+</ul>
+</li>
+<li><strong>任务 XML 导入/导出</strong> — 基于任务计划程序原生 <code>TaskDefinition.XmlText</code>，单任务粒度</li>
+</ul>
+<h2 id="cli-用法"><a class="markdownIt-Anchor" href="#cli-用法"></a> CLI 用法</h2>
+<h3 id="子命令一览"><a class="markdownIt-Anchor" href="#子命令一览"></a> 子命令一览</h3>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>add</code></td>
+<td>添加新任务</td>
+</tr>
+<tr>
+<td><code>update</code></td>
+<td>更新已有任务（仅修改提供的字段）</td>
+</tr>
+<tr>
+<td><code>delete</code></td>
+<td>删除任务（<code>--force</code> 跳过确认）</td>
+</tr>
+<tr>
+<td><code>get</code></td>
+<td>获取任务详情</td>
+</tr>
+<tr>
+<td><code>list</code></td>
+<td>列出任务（<code>--filter</code> 通配匹配）</td>
+</tr>
+<tr>
+<td><code>enable</code> / <code>disable</code></td>
+<td>启用/禁用任务</td>
+</tr>
+<tr>
+<td><code>run</code></td>
+<td>立即运行任务</td>
+</tr>
+<tr>
+<td><code>history</code></td>
+<td>查看运行历史（<code>--last &lt;N&gt;</code>、<code>--errors-only</code>）</td>
+</tr>
+<tr>
+<td><code>export</code> / <code>import</code></td>
+<td>任务 XML 导出/导入</td>
+</tr>
+<tr>
+<td><code>help</code> / <code>h</code></td>
+<td>显示人类友好的完整帮助</td>
+</tr>
+<tr>
+<td><code>manifest</code></td>
+<td>输出机器可读的 CLI manifest JSON（给 Agent 用）</td>
+</tr>
+</tbody>
+</table>
+<p>所有 <code>--name</code> 都相对于 <code>\ScheduleCenter\</code>，支持子文件夹路径（如 <code>--name &quot;MyApp\Backup&quot;</code>）。</p>
+<h3 id="双轨触发器语法"><a class="markdownIt-Anchor" href="#双轨触发器语法"></a> 双轨触发器语法</h3>
+<p><strong>单触发器（V1 兼容）</strong>：<code>--trigger &lt;type&gt;</code> + 对应参数。</p>
+<p><strong>多触发器（V2 新增）</strong>：<code>--triggers-json</code> 或 <code>--triggers-file</code> 传 JSON 数组：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ScheduleCenter.exe add --name Backup --path C:\app.exe ^</span><br><span class="line">  --triggers-json <span class="string">&quot;[&#123;\&quot;kind\&quot;:\&quot;daily\&quot;,\&quot;time\&quot;:\&quot;09:00\&quot;&#125;,&#123;\&quot;kind\&quot;:\&quot;weekly\&quot;,\&quot;time\&quot;:\&quot;10:00\&quot;,\&quot;days\&quot;:[\&quot;MON\&quot;]&#125;]&quot;</span></span><br></pre></td></tr></table></figure>
+<h3 id="输出格式"><a class="markdownIt-Anchor" href="#输出格式"></a> 输出格式</h3>
+<p><strong>成功</strong>（stdout，单行 JSON，退出码 0）：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;success&quot;</span><span class="punctuation">:</span><span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span><span class="attr">&quot;command&quot;</span><span class="punctuation">:</span><span class="string">&quot;add&quot;</span><span class="punctuation">,</span><span class="attr">&quot;task&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;Backup&quot;</span><span class="punctuation">,</span><span class="attr">&quot;path&quot;</span><span class="punctuation">:</span><span class="string">&quot;C:\\app.exe&quot;</span><span class="punctuation">,</span><span class="attr">&quot;triggers&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="punctuation">&#123;</span><span class="attr">&quot;kind&quot;</span><span class="punctuation">:</span><span class="string">&quot;daily&quot;</span><span class="punctuation">,</span><span class="attr">&quot;time&quot;</span><span class="punctuation">:</span><span class="string">&quot;09:00&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">]</span><span class="punctuation">,</span><span class="attr">&quot;enabled&quot;</span><span class="punctuation">:</span><span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span><span class="attr">&quot;nextRunTime&quot;</span><span class="punctuation">:</span><span class="string">&quot;2026-07-24T09:00:00&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p><strong>失败</strong>（stderr，非零退出码）：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;success&quot;</span><span class="punctuation">:</span><span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span><span class="attr">&quot;command&quot;</span><span class="punctuation">:</span><span class="string">&quot;add&quot;</span><span class="punctuation">,</span><span class="attr">&quot;error&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="attr">&quot;code&quot;</span><span class="punctuation">:</span><span class="string">&quot;TASK_EXISTS&quot;</span><span class="punctuation">,</span><span class="attr">&quot;message&quot;</span><span class="punctuation">:</span><span class="string">&quot;任务 &#x27;Backup&#x27; 已存在&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>退出码约定：<code>0</code> 成功、<code>1</code> 通用错误、<code>2</code> 参数错误、<code>3</code> 权限不足、<code>4</code> 任务不存在、<code>5</code> 任务已存在。</p>
+<h2 id="与其他项目的配合"><a class="markdownIt-Anchor" href="#与其他项目的配合"></a> 与其他项目的配合</h2>
+<p>scheduleCenter 是为给其他程序提供定时任务服务而设计的。比如 <a   href='/posts/AutoVideoCompressor-视频素材定时压缩工具/'>AutoVideoCompressor-视频素材定时压缩工具</a> 的 <code>--run-once</code> 模式就可以交给 scheduleCenter 来定时调度，避免每个工具自己实现一套调度逻辑。</p>
+<h2 id="构建"><a class="markdownIt-Anchor" href="#构建"></a> 构建</h2>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dotnet build ScheduleCenter.sln -c Release</span><br></pre></td></tr></table></figure>
+<p>产物路径：<code>src/ScheduleCenter/bin/Release/net48/ScheduleCenter.exe</code></p>
+<p>主要依赖：<a target="_blank" rel="noopener" href="https://github.com/dahall/TaskScheduler">TaskScheduler</a> 2.12.2、Newtonsoft.Json 13.0.3。</p>
+<h2 id="测试"><a class="markdownIt-Anchor" href="#测试"></a> 测试</h2>
+<p>使用 MSTest + 真实任务计划程序集成测试，需在管理员终端运行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dotnet <span class="built_in">test</span> tests/ScheduleCenter.Core.Tests/ScheduleCenter.Core.Tests.csproj</span><br></pre></td></tr></table></figure>
+<p>测试任务全部创建在 <code>\ScheduleCenter\Tests\</code> 子文件夹下，命名 <code>Test_&#123;guid&#125;</code>，用完自动清理。当前 66 个测试通过。</p>
+<h2 id="版本历史"><a class="markdownIt-Anchor" href="#版本历史"></a> 版本历史</h2>
+<table>
+<thead>
+<tr>
+<th>版本</th>
+<th>日期</th>
+<th>摘要</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>V2</strong></td>
+<td>2026-07-24</td>
+<td>高级触发器与条件 + 任务 XML 导入导出。<strong>破坏性变更</strong>：<code>Trigger</code>（单字段）→ <code>Triggers</code>（数组）；CLI JSON 输出 <code>trigger</code> 对象 → <code>triggers</code> 数组；V1 单触发器 CLI 输入语法保留（双轨兼容）</td>
+</tr>
+<tr>
+<td><strong>V1</strong></td>
+<td>2026-07-23</td>
+<td>基础功能：6 种触发器、CRUD、启用/禁用、运行、历史、GUI 管理、CLI JSON 契约</td>
+</tr>
+</tbody>
+</table>
+<h2 id="许可"><a class="markdownIt-Anchor" href="#许可"></a> 许可</h2>
+<p>MIT</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>guyu-guyu
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://guyu-guyu.github.io/posts/scheduleCenter-Windows%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E7%AE%A1%E7%90%86%E4%B8%AD%E5%BF%83/" title="scheduleCenter — Windows 定时任务管理中心">https://guyu-guyu.github.io/posts/scheduleCenter-Windows定时任务管理中心/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Windows/" rel="tag"># Windows</a>
+              <a href="/tags/C/" rel="tag"># C#</a>
+              <a href="/tags/NET/" rel="tag"># .NET</a>
+              <a href="/tags/WPF/" rel="tag"># WPF</a>
+              <a href="/tags/%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/" rel="tag"># 定时任务</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/AutoVideoCompressor-%E8%A7%86%E9%A2%91%E7%B4%A0%E6%9D%90%E5%AE%9A%E6%97%B6%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7/" rel="prev" title="AutoVideoCompressor — 视频素材定时压缩工具">
+                  <i class="fa fa-angle-left"></i> AutoVideoCompressor — 视频素材定时压缩工具
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/novelForgePi-%E6%8A%8APi%E6%94%B9%E9%80%A0%E6%88%90%E5%B0%8F%E8%AF%B4%E5%86%99%E4%BD%9C%E5%B7%A5%E5%85%B7/" rel="next" title="novelForgePi — 把 Pi 改造成小说写作工具">
+                  novelForgePi — 把 Pi 改造成小说写作工具 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">guyu-guyu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

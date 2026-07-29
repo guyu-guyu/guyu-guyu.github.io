@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.3.0">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"guyu-guyu.github.io","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.28.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":true,"style":"flat"},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null,"enable":false},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":100,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="基于 Tauri 2 + Rust + Vue 3 的 Windows 桌面工具，自动扫描目录下的视频文件并调用 ffmpeg 压缩，支持 Per-directory 配置、Cron 定时调度和系统托盘常驻。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AutoVideoCompressor — 视频素材定时压缩工具">
+<meta property="og:url" content="https://guyu-guyu.github.io/posts/AutoVideoCompressor-%E8%A7%86%E9%A2%91%E7%B4%A0%E6%9D%90%E5%AE%9A%E6%97%B6%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7/">
+<meta property="og:site_name" content="谷雨的博客">
+<meta property="og:description" content="基于 Tauri 2 + Rust + Vue 3 的 Windows 桌面工具，自动扫描目录下的视频文件并调用 ffmpeg 压缩，支持 Per-directory 配置、Cron 定时调度和系统托盘常驻。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-29T01:00:00.000Z">
+<meta property="article:modified_time" content="2026-07-29T03:40:06.366Z">
+<meta property="article:author" content="guyu-guyu">
+<meta property="article:tag" content="Tauri">
+<meta property="article:tag" content="Rust">
+<meta property="article:tag" content="Vue">
+<meta property="article:tag" content="ffmpeg">
+<meta property="article:tag" content="视频压缩">
+<meta property="article:tag" content="桌面工具">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://guyu-guyu.github.io/posts/AutoVideoCompressor-%E8%A7%86%E9%A2%91%E7%B4%A0%E6%9D%90%E5%AE%9A%E6%97%B6%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://guyu-guyu.github.io/posts/AutoVideoCompressor-%E8%A7%86%E9%A2%91%E7%B4%A0%E6%9D%90%E5%AE%9A%E6%97%B6%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7/","path":"posts/AutoVideoCompressor-视频素材定时压缩工具/","title":"AutoVideoCompressor — 视频素材定时压缩工具"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>AutoVideoCompressor — 视频素材定时压缩工具 | 谷雨的博客</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.5.0/search.js" integrity="sha256-xFC6PJ82SL9b3WkGjFavNiA9gm5z6UBxWPiu4CYjptg=" crossorigin="anonymous" defer></script>
+<script src="/js/third-party/search/local-search.js" defer></script>
+
+
+
+
+
+
+
+  
+
+
+
+
+<link rel="stylesheet" href="/css/obsidian.css">
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+      <img class="custom-logo-image" src="/%5Bobject%20Object%5D" alt="谷雨的博客">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">谷雨的博客</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+      <div class="search-header">
+        <span class="search-icon">
+          <i class="fa fa-search"></i>
+        </span>
+        <div class="search-input-container">
+          <input autocomplete="off" autocapitalize="off" maxlength="80"
+                placeholder="搜索..." spellcheck="false"
+                type="search" class="search-input">
+        </div>
+        <span class="popup-btn-close" role="button">
+          <i class="fa fa-times-circle"></i>
+        </span>
+      </div>
+      <div class="search-result-container">
+        <div class="search-result-icon">
+          <i class="fa fa-spinner fa-pulse fa-5x"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text"> 项目简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%81%9A%E8%BF%99%E4%B8%AA"><span class="nav-number">2.</span> <span class="nav-text"> 为什么做这个</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD"><span class="nav-number">3.</span> <span class="nav-text"> 核心功能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%80%E6%9C%AF%E6%A0%88"><span class="nav-number">4.</span> <span class="nav-text"> 技术栈</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E7%A4%BA%E4%BE%8B"><span class="nav-number">5.</span> <span class="nav-text"> 配置示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-number">6.</span> <span class="nav-text"> 安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E8%A1%8C"><span class="nav-number">7.</span> <span class="nav-text"> 命令行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%91%BD%E5%90%8D%E8%AF%B4%E6%98%8E"><span class="nav-number">8.</span> <span class="nav-text"> 命名说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%B8%E5%8F%AF"><span class="nav-number">9.</span> <span class="nav-text"> 许可</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">guyu-guyu</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">31</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+  <div class="cc-license animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdnjs.cloudflare.com/ajax/libs/creativecommons-vocabulary/2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://guyu-guyu.github.io/posts/AutoVideoCompressor-%E8%A7%86%E9%A2%91%E7%B4%A0%E6%9D%90%E5%AE%9A%E6%97%B6%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="guyu-guyu">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="谷雨的博客">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="AutoVideoCompressor — 视频素材定时压缩工具 | 谷雨的博客">
+      <meta itemprop="description" content="基于 Tauri 2 + Rust + Vue 3 的 Windows 桌面工具，自动扫描目录下的视频文件并调用 ffmpeg 压缩，支持 Per-directory 配置、Cron 定时调度和系统托盘常驻。">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          AutoVideoCompressor — 视频素材定时压缩工具
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2026-07-29 09:00:00 / 修改时间：11:40:06" itemprop="dateCreated datePublished" datetime="2026-07-29T09:00:00+08:00">2026-07-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E9%A1%B9%E7%9B%AE%E4%BB%8B%E7%BB%8D/" itemprop="url" rel="index"><span itemprop="name">项目介绍</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+            <div class="post-description">基于 Tauri 2 + Rust + Vue 3 的 Windows 桌面工具，自动扫描目录下的视频文件并调用 ffmpeg 压缩，支持 Per-directory 配置、Cron 定时调度和系统托盘常驻。</div>
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="项目简介"><a class="markdownIt-Anchor" href="#项目简介"></a> 项目简介</h2>
+<p><strong>AutoVideoCompressor</strong> 是一个基于 <strong>Tauri 2 + Rust + Vue 3</strong> 的 Windows 视频压缩桌面工具。它会自动扫描指定目录下的视频文件，调用 ffmpeg 进行压缩，并保留更小的文件。</p>
+<p>简单来说：你给它一堆目录，它每天定时帮你把里面的视频压得更小，省下硬盘空间。</p>
+<ul>
+<li>仓库地址：<a target="_blank" rel="noopener" href="https://github.com/guyu-guyu/AutoVideoCompressor">https://github.com/guyu-guyu/AutoVideoCompressor</a></li>
+<li>主要语言：Rust（业务逻辑全部在 Rust 层）</li>
+<li>平台：Windows 10/11 (x64)</li>
+</ul>
+<h2 id="为什么做这个"><a class="markdownIt-Anchor" href="#为什么做这个"></a> 为什么做这个</h2>
+<p>平时攒的视频素材越来越多，手动一个个用 ffmpeg 压缩太累人。市面上的工具要么不支持定时，要么不能按目录配置不同策略，于是自己写了一个。</p>
+<h2 id="核心功能"><a class="markdownIt-Anchor" href="#核心功能"></a> 核心功能</h2>
+<ul>
+<li><strong>Per-directory 独立配置</strong> — 每个目录有独立的 include/exclude 规则、过滤器、重命名规则、调度时间</li>
+<li><strong>Cron 定时调度</strong> — 每天指定时间自动压缩，严格不补跑</li>
+<li><strong>串行执行</strong> — 同一时间只压缩一个目录，完成后自动处理队列中的下一个</li>
+<li><strong>实时进度推送</strong> — 逐文件压缩进度，支持手动停止</li>
+<li><strong>循环压缩检测</strong> — 自动识别重命名后再次匹配的白名单文件，标记风险</li>
+<li><strong>全局参数模板</strong> — 可自定义 H.265/H.264 预设模板，按目录选用或自定义</li>
+<li><strong>单次压缩总大小限制</strong> — 按文件顺序累计，超出部分自动跳过并在预览中标注</li>
+<li><strong>压缩历史日志</strong> — 人类可读文本 + 机器可读 JSON 块，保留天数可配</li>
+<li><strong>压缩文件预览</strong> — 显示匹配文件、压缩后文件名、大小、循环风险、单次限制状态</li>
+<li><strong>系统托盘常驻</strong> — 最小化到托盘、右键菜单（显示主窗口 / 退出）</li>
+<li><strong>开机自启动</strong></li>
+<li><strong><code>--run-once</code> 模式</strong> — 无窗口单次执行，供 Windows 任务计划程序调用</li>
+</ul>
+<h2 id="技术栈"><a class="markdownIt-Anchor" href="#技术栈"></a> 技术栈</h2>
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>技术</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>框架</td>
+<td>Tauri 2.x</td>
+</tr>
+<tr>
+<td>后端</td>
+<td>Rust（业务逻辑全部在 Rust 层）</td>
+</tr>
+<tr>
+<td>前端</td>
+<td>Vue 3 + TypeScript + Vite</td>
+</tr>
+<tr>
+<td>UI 库</td>
+<td>Naive UI</td>
+</tr>
+<tr>
+<td>平台</td>
+<td>Windows 10/11 (x64)</td>
+</tr>
+</tbody>
+</table>
+<p>业务逻辑全部放在 Rust 层是刻意的选择——压缩是 CPU 密集型任务，放在 Rust 里既快又稳，前端只负责展示和交互。</p>
+<h2 id="配置示例"><a class="markdownIt-Anchor" href="#配置示例"></a> 配置示例</h2>
+<p>全局配置位于 <code>%APPDATA%/AutoCompress/config.json</code>，目录级配置位于 <code>&lt;目录&gt;/.autocompress/config.json</code>。一个典型的目录级配置长这样：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;include&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;*.mp4&quot;</span><span class="punctuation">,</span> <span class="string">&quot;*.mov&quot;</span><span class="punctuation">,</span> <span class="string">&quot;*.avi&quot;</span><span class="punctuation">,</span> <span class="string">&quot;*.mkv&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;exclude&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;*[compress]*&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;filters&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span> <span class="attr">&quot;max_size_mb&quot;</span><span class="punctuation">:</span> <span class="number">2048</span><span class="punctuation">,</span> <span class="attr">&quot;min_size_mb&quot;</span><span class="punctuation">:</span> <span class="number">10</span> <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;max_compress_size_mb&quot;</span><span class="punctuation">:</span> <span class="number">4096</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;rename_rules&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="punctuation">&#123;</span> <span class="attr">&quot;pattern&quot;</span><span class="punctuation">:</span> <span class="string">&quot;^(.+)(\\.[^.]+)$&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;replacement&quot;</span><span class="punctuation">:</span> <span class="string">&quot;$1[compress]$2&quot;</span> <span class="punctuation">&#125;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;params&quot;</span><span class="punctuation">:</span> <span class="string">&quot;H.265 高质量&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;use_custom_params&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;schedule&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span> <span class="attr">&quot;time&quot;</span><span class="punctuation">:</span> <span class="string">&quot;03:00&quot;</span> <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>重命名规则会把 <code>video.mp4</code> 改名为 <code>video[compress].mp4</code>，配合 exclude 规则避免循环压缩。</p>
+<h2 id="安装"><a class="markdownIt-Anchor" href="#安装"></a> 安装</h2>
+<p>从 <a target="_blank" rel="noopener" href="https://github.com/guyu-guyu/AutoVideoCompressor/releases">Releases</a> 下载最新版：</p>
+<ul>
+<li><code>AutoCompress_x.x.x_x64-setup.exe</code> — NSIS 安装程序（推荐）</li>
+<li><code>autocompress.exe</code> — 便携版，无需安装</li>
+</ul>
+<p><strong>依赖</strong>：需安装 <a target="_blank" rel="noopener" href="https://ffmpeg.org/download.html">ffmpeg</a>，可以在 PATH 中使用，或在全局设置中指定路径。</p>
+<h2 id="命令行"><a class="markdownIt-Anchor" href="#命令行"></a> 命令行</h2>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 无窗口运行一次（对所有已启用目录执行压缩，完成后退出）</span></span><br><span class="line">autocompress.exe --run-once</span><br></pre></td></tr></table></figure>
+<p>这个模式可以配合 [[scheduleCenter]] 之类的定时任务工具做更灵活的调度。</p>
+<h2 id="命名说明"><a class="markdownIt-Anchor" href="#命名说明"></a> 命名说明</h2>
+<p>项目名称为 <strong>AutoVideoCompressor</strong>。代码内部的包名（<code>autocompress</code>）、产品显示名（<code>AutoCompress</code>）、配置目录（<code>%APPDATA%/AutoCompress</code>）等都是历史遗留的内部标识符，与实际代码保持一致，不代表项目名称变更。</p>
+<h2 id="许可"><a class="markdownIt-Anchor" href="#许可"></a> 许可</h2>
+<p>MIT</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>guyu-guyu
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://guyu-guyu.github.io/posts/AutoVideoCompressor-%E8%A7%86%E9%A2%91%E7%B4%A0%E6%9D%90%E5%AE%9A%E6%97%B6%E5%8E%8B%E7%BC%A9%E5%B7%A5%E5%85%B7/" title="AutoVideoCompressor — 视频素材定时压缩工具">https://guyu-guyu.github.io/posts/AutoVideoCompressor-视频素材定时压缩工具/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Tauri/" rel="tag"># Tauri</a>
+              <a href="/tags/Rust/" rel="tag"># Rust</a>
+              <a href="/tags/Vue/" rel="tag"># Vue</a>
+              <a href="/tags/ffmpeg/" rel="tag"># ffmpeg</a>
+              <a href="/tags/%E8%A7%86%E9%A2%91%E5%8E%8B%E7%BC%A9/" rel="tag"># 视频压缩</a>
+              <a href="/tags/%E6%A1%8C%E9%9D%A2%E5%B7%A5%E5%85%B7/" rel="tag"># 桌面工具</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/scheduleCenter-Windows%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E7%AE%A1%E7%90%86%E4%B8%AD%E5%BF%83/" rel="next" title="scheduleCenter — Windows 定时任务管理中心">
+                  scheduleCenter — Windows 定时任务管理中心 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">guyu-guyu</span>
+  </div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>
