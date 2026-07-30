@@ -7,7 +7,7 @@
 <p><strong>AutoVideoCompressor</strong> 是一个基于 <strong>Tauri 2 + Rust + Vue 3</strong> 的 Windows 视频压缩桌面工具。它会自动扫描指定目录下的视频文件，调用 ffmpeg 进行压缩，并保留更小的文件。</p>
 <p>简单来说：你给它一堆目录，它每天定时帮你把里面的视频压得更小，省下硬盘空间。</p>
 <ul>
-<li>仓库地址：<a href="https://github.com/guyu-guyu/AutoVideoCompressor">https://github.com/guyu-guyu/AutoVideoCompressor</a></li>
+<li>仓库地址：<a class="link"   href="https://github.com/guyu-guyu/AutoVideoCompressor" >https://github.com/guyu-guyu/AutoVideoCompressor<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 <li>主要语言：Rust（业务逻辑全部在 Rust 层）</li>
 <li>平台：Windows 10/11 (x64)</li>
 </ul>
@@ -62,17 +62,17 @@
 <p>业务逻辑全部放在 Rust 层是刻意的选择——压缩是 CPU 密集型任务，放在 Rust 里既快又稳，前端只负责展示和交互。</p>
 <h2 id="配置示例">配置示例</h2>
 <p>全局配置位于 <code>%APPDATA%/AutoCompress/config.json</code>，目录级配置位于 <code>&lt;目录&gt;/.autocompress/config.json</code>。一个典型的目录级配置长这样：</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;include&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;*.mp4&quot;</span><span class="punctuation">,</span> <span class="string">&quot;*.mov&quot;</span><span class="punctuation">,</span> <span class="string">&quot;*.avi&quot;</span><span class="punctuation">,</span> <span class="string">&quot;*.mkv&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;exclude&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;*[compress]*&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;filters&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span> <span class="attr">&quot;max_size_mb&quot;</span><span class="punctuation">:</span> <span class="number">2048</span><span class="punctuation">,</span> <span class="attr">&quot;min_size_mb&quot;</span><span class="punctuation">:</span> <span class="number">10</span> <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;max_compress_size_mb&quot;</span><span class="punctuation">:</span> <span class="number">4096</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;rename_rules&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="punctuation">&#123;</span> <span class="attr">&quot;pattern&quot;</span><span class="punctuation">:</span> <span class="string">&quot;^(.+)(\\.[^.]+)$&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;replacement&quot;</span><span class="punctuation">:</span> <span class="string">&quot;$1[compress]$2&quot;</span> <span class="punctuation">&#125;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;params&quot;</span><span class="punctuation">:</span> <span class="string">&quot;H.265 高质量&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;use_custom_params&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;schedule&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span> <span class="attr">&quot;time&quot;</span><span class="punctuation">:</span> <span class="string">&quot;03:00&quot;</span> <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<div class="code-container" data-rel="Json"><figure class="iseeu highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;include&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;*.mp4&quot;</span><span class="punctuation">,</span> <span class="string">&quot;*.mov&quot;</span><span class="punctuation">,</span> <span class="string">&quot;*.avi&quot;</span><span class="punctuation">,</span> <span class="string">&quot;*.mkv&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;exclude&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="string">&quot;*[compress]*&quot;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;filters&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span> <span class="attr">&quot;max_size_mb&quot;</span><span class="punctuation">:</span> <span class="number">2048</span><span class="punctuation">,</span> <span class="attr">&quot;min_size_mb&quot;</span><span class="punctuation">:</span> <span class="number">10</span> <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;max_compress_size_mb&quot;</span><span class="punctuation">:</span> <span class="number">4096</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;rename_rules&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="punctuation">&#123;</span> <span class="attr">&quot;pattern&quot;</span><span class="punctuation">:</span> <span class="string">&quot;^(.+)(\\.[^.]+)$&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;replacement&quot;</span><span class="punctuation">:</span> <span class="string">&quot;$1[compress]$2&quot;</span> <span class="punctuation">&#125;</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;params&quot;</span><span class="punctuation">:</span> <span class="string">&quot;H.265 高质量&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;use_custom_params&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;schedule&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span> <span class="attr">&quot;time&quot;</span><span class="punctuation">:</span> <span class="string">&quot;03:00&quot;</span> <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure></div>
 <p>重命名规则会把 <code>video.mp4</code> 改名为 <code>video[compress].mp4</code>，配合 exclude 规则避免循环压缩。</p>
 <h2 id="安装">安装</h2>
-<p>从 <a href="https://github.com/guyu-guyu/AutoVideoCompressor/releases">Releases</a> 下载最新版：</p>
+<p>从 <a class="link"   href="https://github.com/guyu-guyu/AutoVideoCompressor/releases" >Releases<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 下载最新版：</p>
 <ul>
 <li><code>AutoCompress_x.x.x_x64-setup.exe</code> — NSIS 安装程序（推荐）</li>
 <li><code>autocompress.exe</code> — 便携版，无需安装</li>
 </ul>
-<p><strong>依赖</strong>：需安装 <a href="https://ffmpeg.org/download.html">ffmpeg</a>，可以在 PATH 中使用，或在全局设置中指定路径。</p>
+<p><strong>依赖</strong>：需安装 <a class="link"   href="https://ffmpeg.org/download.html" >ffmpeg<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>，可以在 PATH 中使用，或在全局设置中指定路径。</p>
 <h2 id="命令行">命令行</h2>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 无窗口运行一次（对所有已启用目录执行压缩，完成后退出）</span></span><br><span class="line">autocompress.exe --run-once</span><br></pre></td></tr></table></figure>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 无窗口运行一次（对所有已启用目录执行压缩，完成后退出）</span></span><br><span class="line">autocompress.exe --run-once</span><br></pre></td></tr></table></figure></div>
 <p>这个模式可以配合 [[scheduleCenter]] 之类的定时任务工具做更灵活的调度。</p>
 <h2 id="命名说明">命名说明</h2>
 <p>项目名称为 <strong>AutoVideoCompressor</strong>。代码内部的包名（<code>autocompress</code>）、产品显示名（<code>AutoCompress</code>）、配置目录（<code>%APPDATA%/AutoCompress</code>）等都是历史遗留的内部标识符，与实际代码保持一致，不代表项目名称变更。</p>
@@ -95,9 +95,9 @@
     <title>MaskForge — SillyTavern 角色卡生成与编辑工具</title>
     <url>/posts/MaskForge-SillyTavern%E8%A7%92%E8%89%B2%E5%8D%A1%E5%B7%A5%E5%85%B7/</url>
     <content><![CDATA[<h2 id="项目简介">项目简介</h2>
-<p><strong>MaskForge</strong> 是一个 <a href="https://docs.sillytavern.app/">SillyTavern</a> 角色卡（Character Card V3 schema）生成、修改、编辑工具。它作为 <a href="https://pi.dev">Pi Coding Agent</a> 的 skill 发布，让你可以用自然语言驱动 AI 来创建和编辑角色卡。</p>
+<p><strong>MaskForge</strong> 是一个 <a class="link"   href="https://docs.sillytavern.app/" >SillyTavern<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 角色卡（Character Card V3 schema）生成、修改、编辑工具。它作为 <a class="link"   href="https://pi.dev" >Pi Coding Agent<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 的 skill 发布，让你可以用自然语言驱动 AI 来创建和编辑角色卡。</p>
 <ul>
-<li>仓库地址：<a href="https://github.com/guyu-guyu/MaskForge">https://github.com/guyu-guyu/MaskForge</a></li>
+<li>仓库地址：<a class="link"   href="https://github.com/guyu-guyu/MaskForge" >https://github.com/guyu-guyu/MaskForge<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 <li>主要语言：JavaScript</li>
 <li>Skill 名称：<code>maskforge</code></li>
 </ul>
@@ -110,10 +110,10 @@
 </ul>
 <p>MaskForge 把角色卡的创建/编辑做成 Pi 的 skill，让 AI 理解 schema、按规范生成、并打包成可导入 SillyTavern 的 PNG 文件。</p>
 <h2 id="项目结构">项目结构</h2>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">MaskForge/</span><br><span class="line">├── SKILL.md              # skill 入口（Pi 读取的技能说明）</span><br><span class="line">├── package.json          # 依赖管理（png-chunks-* 系列）</span><br><span class="line">├── schemas/              # SillyTavern 角色卡 V3 schema</span><br><span class="line">├── scripts/              # PNG 角色卡操作脚本</span><br><span class="line">│   ├── pack.js           # 把 JSON 元数据打包进 PNG</span><br><span class="line">│   ├── unpack.js         # 从 PNG 提取角色卡 JSON</span><br><span class="line">│   ├── cover.js          # 替换/修改 PNG 封面</span><br><span class="line">│   ├── describe.js       # 描述 schema 字段</span><br><span class="line">│   ├── generate.js       # 生成角色卡 JSON</span><br><span class="line">│   └── validate.js       # 校验角色卡是否符合 schema</span><br><span class="line">└── references/</span><br><span class="line">    └── schema-guide.md   # 字段速查手册</span><br></pre></td></tr></table></figure>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">MaskForge/</span><br><span class="line">├── SKILL.md              # skill 入口（Pi 读取的技能说明）</span><br><span class="line">├── package.json          # 依赖管理（png-chunks-* 系列）</span><br><span class="line">├── schemas/              # SillyTavern 角色卡 V3 schema</span><br><span class="line">├── scripts/              # PNG 角色卡操作脚本</span><br><span class="line">│   ├── pack.js           # 把 JSON 元数据打包进 PNG</span><br><span class="line">│   ├── unpack.js         # 从 PNG 提取角色卡 JSON</span><br><span class="line">│   ├── cover.js          # 替换/修改 PNG 封面</span><br><span class="line">│   ├── describe.js       # 描述 schema 字段</span><br><span class="line">│   ├── generate.js       # 生成角色卡 JSON</span><br><span class="line">│   └── validate.js       # 校验角色卡是否符合 schema</span><br><span class="line">└── references/</span><br><span class="line">    └── schema-guide.md   # 字段速查手册</span><br></pre></td></tr></table></figure></div>
 <h2 id="核心能力">核心能力</h2>
 <h3 id="PNG-角色卡操作">PNG 角色卡操作</h3>
-<p>SillyTavern 的角色卡是 PNG 图片，角色数据以 <a href="https://en.wikipedia.org/wiki/PNG_metadata">PNG tEXt chunk</a> 的形式嵌入。MaskForge 提供三个脚本来操作这套格式：</p>
+<p>SillyTavern 的角色卡是 PNG 图片，角色数据以 <a class="link"   href="https://en.wikipedia.org/wiki/PNG_metadata" >PNG tEXt chunk<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 的形式嵌入。MaskForge 提供三个脚本来操作这套格式：</p>
 <ul>
 <li><strong><code>pack.js</code></strong> — 把角色 JSON 元数据打包进 PNG 图片，生成可导入 SillyTavern 的角色卡</li>
 <li><strong><code>unpack.js</code></strong> — 从 PNG 角色卡提取出 JSON 元数据，便于查看和修改</li>
@@ -158,9 +158,9 @@
     <title>beeimg-uploader — Obsidian 蜜蜂图床上传插件</title>
     <url>/posts/beeimg-uploader-Obsidian%E8%9C%9C%E8%9C%82%E5%9B%BE%E5%BA%8A%E4%B8%8A%E4%BC%A0%E6%8F%92%E4%BB%B6/</url>
     <content><![CDATA[<h2 id="项目简介">项目简介</h2>
-<p><strong>beeimg-uploader</strong> 是一个 <a href="https://obsidian.md/">Obsidian</a> 插件，在粘贴或拖拽图片时自动上传到 <a href="https://www.beeimg.cn/">蜜蜂图床</a>（基于 Lsky Pro），并把文档中的图片链接替换为图床外链。</p>
+<p><strong>beeimg-uploader</strong> 是一个 <a class="link"   href="https://obsidian.md/" >Obsidian<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 插件，在粘贴或拖拽图片时自动上传到 <a class="link"   href="https://www.beeimg.cn/" >蜜蜂图床<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>（基于 Lsky Pro），并把文档中的图片链接替换为图床外链。</p>
 <ul>
-<li>仓库地址：<a href="https://github.com/guyu-guyu/beeimg-uploader">https://github.com/guyu-guyu/beeimg-uploader</a></li>
+<li>仓库地址：<a class="link"   href="https://github.com/guyu-guyu/beeimg-uploader" >https://github.com/guyu-guyu/beeimg-uploader<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 <li>主要语言：TypeScript</li>
 <li>当前版本：1.0.2</li>
 </ul>
@@ -185,7 +185,7 @@
 <h2 id="安装">安装</h2>
 <h3 id="方式一：手动安装">方式一：手动安装</h3>
 <ol>
-<li>从 <a href="https://github.com/guyu-guyu/beeimg-uploader/releases">Releases</a> 下载最新版的 <code>beeimg-uploader-x.y.z.zip</code></li>
+<li>从 <a class="link"   href="https://github.com/guyu-guyu/beeimg-uploader/releases" >Releases<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 下载最新版的 <code>beeimg-uploader-x.y.z.zip</code></li>
 <li>解压得到 <code>manifest.json</code>、<code>main.js</code>、<code>styles.css</code> 三个文件</li>
 <li>在你的 vault 中创建目录 <code>.obsidian/plugins/beeimg-uploader/</code></li>
 <li>把三个文件放入该目录</li>
@@ -193,7 +193,7 @@
 <li>在已安装插件列表中找到「BeeImg 蜜蜂图床上传」并启用</li>
 </ol>
 <h3 id="方式二：通过-BRAT-安装">方式二：通过 BRAT 安装</h3>
-<p>Releases 里同时附带了 <code>main.js</code>、<code>manifest.json</code>、<code>styles.css</code> 三个单独文件，可被 <a href="https://github.com/TfTHacker/obsidian42-brat">BRAT</a> 等 Obsidian 插件管理器直接识别：</p>
+<p>Releases 里同时附带了 <code>main.js</code>、<code>manifest.json</code>、<code>styles.css</code> 三个单独文件，可被 <a class="link"   href="https://github.com/TfTHacker/obsidian42-brat" >BRAT<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 等 Obsidian 插件管理器直接识别：</p>
 <ol>
 <li>安装 BRAT 插件</li>
 <li>BRAT → Add Beta plugin → 填入 <code>https://github.com/guyu-guyu/beeimg-uploader</code></li>
@@ -282,19 +282,19 @@
     <title>guyu-bucket — 自用 Scoop Bucket</title>
     <url>/posts/guyu-bucket-%E8%87%AA%E7%94%A8Scoop-Bucket/</url>
     <content><![CDATA[<h2 id="项目简介">项目简介</h2>
-<p><strong>guyu-bucket</strong> 是我个人维护的 <a href="https://scoop.sh">Scoop</a> bucket，收录我自己维护和常用的应用清单（manifest）。</p>
+<p><strong>guyu-bucket</strong> 是我个人维护的 <a class="link"   href="https://scoop.sh" >Scoop<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> bucket，收录我自己维护和常用的应用清单（manifest）。</p>
 <ul>
-<li>仓库地址：<a href="https://github.com/guyu-guyu/guyu-bucket">https://github.com/guyu-guyu/guyu-bucket</a></li>
+<li>仓库地址：<a class="link"   href="https://github.com/guyu-guyu/guyu-bucket" >https://github.com/guyu-guyu/guyu-bucket<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
 <h2 id="为什么做这个">为什么做这个</h2>
-<p><a href="https://scoop.sh">Scoop</a> 是 Windows 上流行的命令行包管理器，主打便携、用户级安装、不污染系统。它用 “bucket”（仓库）来组织应用清单——你可以把它理解成类似 Homebrew 的 tap。</p>
+<p><a class="link"   href="https://scoop.sh" >Scoop<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 是 Windows 上流行的命令行包管理器，主打便携、用户级安装、不污染系统。它用 “bucket”（仓库）来组织应用清单——你可以把它理解成类似 Homebrew 的 tap。</p>
 <p>我自己写的桌面工具如果要手动分发安装包，用户得自己去 Releases 页面下载、解压、放目录、加 PATH，体验很差。把它们做成 Scoop manifest 之后，用户一条命令就能装好：</p>
-<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">scoop install guyu<span class="literal">-bucket</span>/autovideocompressor</span><br></pre></td></tr></table></figure>
+<div class="code-container" data-rel="Powershell"><figure class="iseeu highlight powershell"><table><tr><td class="code"><pre><span class="line">scoop install guyu<span class="literal">-bucket</span>/autovideocompressor</span><br></pre></td></tr></table></figure></div>
 <p>升级也是一条命令：<code>scoop update autovideocompressor</code>。</p>
 <h2 id="使用方法">使用方法</h2>
-<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 添加此 bucket</span></span><br><span class="line">scoop bucket add guyu<span class="literal">-bucket</span> https://github.com/guyu<span class="literal">-guyu</span>/guyu<span class="literal">-bucket</span>.git</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装应用</span></span><br><span class="line">scoop install guyu<span class="literal">-bucket</span>/&lt;app<span class="literal">-name</span>&gt;</span><br></pre></td></tr></table></figure>
+<div class="code-container" data-rel="Powershell"><figure class="iseeu highlight powershell"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 添加此 bucket</span></span><br><span class="line">scoop bucket add guyu<span class="literal">-bucket</span> https://github.com/guyu<span class="literal">-guyu</span>/guyu<span class="literal">-bucket</span>.git</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装应用</span></span><br><span class="line">scoop install guyu<span class="literal">-bucket</span>/&lt;app<span class="literal">-name</span>&gt;</span><br></pre></td></tr></table></figure></div>
 <h2 id="目录结构">目录结构</h2>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">bucket/       # 应用 manifest 文件（JSON）</span><br><span class="line">README.md     # 本文件</span><br></pre></td></tr></table></figure>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">bucket/       # 应用 manifest 文件（JSON）</span><br><span class="line">README.md     # 本文件</span><br></pre></td></tr></table></figure></div>
 <p>每个应用对应 <code>bucket/</code> 下的一个 JSON manifest 文件，定义下载地址、校验值、安装方式、环境变量等。</p>
 <h2 id="收录的应用">收录的应用</h2>
 <table>
@@ -307,12 +307,12 @@
 </thead>
 <tbody>
 <tr>
-<td><a href="https://github.com/guyu-guyu/AutoVideoCompressor">autovideocompressor</a></td>
+<td><a class="link"   href="https://github.com/guyu-guyu/AutoVideoCompressor" >autovideocompressor<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></td>
 <td>视频素材定时压缩工具 — 自动扫描目录、调用 ffmpeg 压缩、支持 Per-directory 配置和 cron 调度</td>
 <td>0.2.1</td>
 </tr>
 <tr>
-<td><a href="https://github.com/guyu-guyu/scheduleCenter">schedulecenter</a></td>
+<td><a class="link"   href="https://github.com/guyu-guyu/scheduleCenter" >schedulecenter<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></td>
 <td>Windows 定时任务管理中心 — WPF GUI + CLI 双模式，管理 Windows 任务计划程序</td>
 <td>0.1.1</td>
 </tr>
@@ -347,9 +347,9 @@
     <title>guyu-skills — 我的 Pi 技能集合</title>
     <url>/posts/guyu-skills-%E6%88%91%E7%9A%84Pi%E6%8A%80%E8%83%BD%E9%9B%86%E5%90%88/</url>
     <content><![CDATA[<h2 id="项目简介">项目简介</h2>
-<p><strong>guyu-skills</strong> 是我个人维护的 <a href="https://pi.dev">Pi Coding Agent</a> skill 集合，作为各种 skill 的统一发布仓库。</p>
+<p><strong>guyu-skills</strong> 是我个人维护的 <a class="link"   href="https://pi.dev" >Pi Coding Agent<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> skill 集合，作为各种 skill 的统一发布仓库。</p>
 <ul>
-<li>仓库地址：<a href="https://github.com/guyu-guyu/guyu-skills">https://github.com/guyu-guyu/guyu-skills</a></li>
+<li>仓库地址：<a class="link"   href="https://github.com/guyu-guyu/guyu-skills" >https://github.com/guyu-guyu/guyu-skills<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 <li>主要语言：JavaScript</li>
 <li>当前收录：<a   href='/posts/MaskForge-SillyTavern角色卡工具/'>MaskForge-SillyTavern角色卡工具</a></li>
 </ul>
@@ -362,14 +362,14 @@
 </ul>
 <h2 id="目录结构">目录结构</h2>
 <p>每个 skill 是仓库根目录下的一个子目录，目录名即 skill 名：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">guyu-skills/</span><br><span class="line">└── MaskForge/        # SillyTavern 角色卡生成/编辑 skill</span><br><span class="line">    ├── SKILL.md</span><br><span class="line">    ├── package.json</span><br><span class="line">    ├── schemas/</span><br><span class="line">    ├── scripts/</span><br><span class="line">    └── references/</span><br></pre></td></tr></table></figure>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">guyu-skills/</span><br><span class="line">└── MaskForge/        # SillyTavern 角色卡生成/编辑 skill</span><br><span class="line">    ├── SKILL.md</span><br><span class="line">    ├── package.json</span><br><span class="line">    ├── schemas/</span><br><span class="line">    ├── scripts/</span><br><span class="line">    └── references/</span><br></pre></td></tr></table></figure></div>
 <h2 id="当前收录">当前收录</h2>
 <h3 id="MaskForge">MaskForge</h3>
 <p>SillyTavern 角色卡（V3 schema）生成、修改、编辑工具。提供 PNG 角色卡打包/解包、字段描述、生成与校验脚本。</p>
 <p>详细介绍见 <a   href='/posts/MaskForge-SillyTavern角色卡工具/'>MaskForge-SillyTavern角色卡工具</a>。</p>
 <h2 id="使用方式">使用方式</h2>
 <p>Pi 支持从 git 仓库安装 skill。具体安装命令参考 Pi 官方文档，大致形式是：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">pi install git:github.com/guyu-guyu/guyu-skills</span><br></pre></td></tr></table></figure>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">pi install git:github.com/guyu-guyu/guyu-skills</span><br></pre></td></tr></table></figure></div>
 <p>或在项目级配置里把整个仓库作为 skill 源，再按需启用其中的子目录。</p>
 <h2 id="与其他项目的关系">与其他项目的关系</h2>
 <p>guyu-skills 里的 skill 可以配合 <a   href='/posts/pi-isolate-以隔离模式运行pi的命令/'>pi-isolate-以隔离模式运行pi的命令</a> 使用——在隔离环境里按需 <code>--add-skill</code> 把某个 skill 从全局拣选到当前项目，保持项目环境的纯净。</p>
@@ -392,9 +392,9 @@
     <title>novelForgePi — 把 Pi 改造成小说写作工具</title>
     <url>/posts/novelForgePi-%E6%8A%8APi%E6%94%B9%E9%80%A0%E6%88%90%E5%B0%8F%E8%AF%B4%E5%86%99%E4%BD%9C%E5%B7%A5%E5%85%B7/</url>
     <content><![CDATA[<h2 id="项目简介">项目简介</h2>
-<p><strong>novelForgePi</strong> 把 <a href="https://pi.dev">Pi Coding Agent</a> 改造为中文网文写作辅助工具。它是一组 Pi 的扩展（packages + skills + slash commands），装上之后 Pi 就能帮你开新书、规划大纲、写场景、做一致性审计。</p>
+<p><strong>novelForgePi</strong> 把 <a class="link"   href="https://pi.dev" >Pi Coding Agent<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 改造为中文网文写作辅助工具。它是一组 Pi 的扩展（packages + skills + slash commands），装上之后 Pi 就能帮你开新书、规划大纲、写场景、做一致性审计。</p>
 <ul>
-<li>仓库地址：<a href="https://github.com/guyu-guyu/novelForgePi">https://github.com/guyu-guyu/novelForgePi</a></li>
+<li>仓库地址：<a class="link"   href="https://github.com/guyu-guyu/novelForgePi" >https://github.com/guyu-guyu/novelForgePi<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 <li>主要语言：TypeScript</li>
 <li>安装方式：<code>pi install git:github.com/guyu-guyu/novelForgePi</code></li>
 </ul>
@@ -408,7 +408,7 @@
 </ul>
 <p>novelForgePi 想解决的就是这些问题——给 Pi 一套写作领域的原子工具和技能，让它像个懂网文的助手一样工作。</p>
 <h2 id="快速开始">快速开始</h2>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">pi install git:github.com/guyu-guyu/novelForgePi</span><br><span class="line"></span><br><span class="line"><span class="built_in">mkdir</span> my-novel &amp;&amp; <span class="built_in">cd</span> my-novel</span><br><span class="line">pi</span><br><span class="line">&gt; /new-book          <span class="comment"># 初始化骨架</span></span><br><span class="line">&gt; /outline           <span class="comment"># 规划大纲</span></span><br><span class="line">&gt; /new-chapter       <span class="comment"># 新建章</span></span><br><span class="line">&gt; /new-scene         <span class="comment"># 新建场景</span></span><br><span class="line">&gt; /write             <span class="comment"># 续写</span></span><br></pre></td></tr></table></figure>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">pi install git:github.com/guyu-guyu/novelForgePi</span><br><span class="line"></span><br><span class="line"><span class="built_in">mkdir</span> my-novel &amp;&amp; <span class="built_in">cd</span> my-novel</span><br><span class="line">pi</span><br><span class="line">&gt; /new-book          <span class="comment"># 初始化骨架</span></span><br><span class="line">&gt; /outline           <span class="comment"># 规划大纲</span></span><br><span class="line">&gt; /new-chapter       <span class="comment"># 新建章</span></span><br><span class="line">&gt; /new-scene         <span class="comment"># 新建场景</span></span><br><span class="line">&gt; /write             <span class="comment"># 续写</span></span><br></pre></td></tr></table></figure></div>
 <h2 id="概览">概览</h2>
 <ul>
 <li><strong>32 个原子文件工具</strong>（scene / chapter / codex / character / outline / ctx / stats）</li>
@@ -429,9 +429,9 @@
 <p><code>consistency-audit</code> 技能会扫描已写的章节，对照设定集（角色、世界观、物品）找出前后矛盾的地方。长篇小说写到 50 万字的时候，这个功能救命。</p>
 <h2 id="文档">文档</h2>
 <ul>
-<li><a href="https://github.com/guyu-guyu/novelForgePi/blob/main/docs/usage.md">使用指南</a> — 安装、开新书、写作工作流、题材包、常见问题</li>
-<li><a href="https://github.com/guyu-guyu/novelForgePi/blob/main/docs/architecture.md">代码架构</a> — 目录结构、核心抽象、扩展生命周期、技术栈</li>
-<li><a href="https://github.com/guyu-guyu/novelForgePi/blob/main/docs/roadmap.md">v2 路线图</a> — 已知局限、规划方向</li>
+<li><a class="link"   href="https://github.com/guyu-guyu/novelForgePi/blob/main/docs/usage.md" >使用指南<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> — 安装、开新书、写作工作流、题材包、常见问题</li>
+<li><a class="link"   href="https://github.com/guyu-guyu/novelForgePi/blob/main/docs/architecture.md" >代码架构<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> — 目录结构、核心抽象、扩展生命周期、技术栈</li>
+<li><a class="link"   href="https://github.com/guyu-guyu/novelForgePi/blob/main/docs/roadmap.md" >v2 路线图<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> — 已知局限、规划方向</li>
 </ul>
 <h2 id="与-pi-isolate-的配合">与 pi-isolate 的配合</h2>
 <p>novelForgePi 的 <code>/new-book</code> 命令会在书项目里建好 <code>.pi-isolated/</code> 并 symlink novelForgePi 包，然后提示你退出 pi 跑 <a   href='/posts/pi-isolate-以隔离模式运行pi的命令/'>pi-isolate-以隔离模式运行pi的命令</a>。两者职责分离：</p>
@@ -472,9 +472,9 @@
     <title>pi-isolate — 以隔离模式运行 Pi 的命令</title>
     <url>/posts/pi-isolate-%E4%BB%A5%E9%9A%94%E7%A6%BB%E6%A8%A1%E5%BC%8F%E8%BF%90%E8%A1%8Cpi%E7%9A%84%E5%91%BD%E4%BB%A4/</url>
     <content><![CDATA[<h2 id="项目简介">项目简介</h2>
-<p><strong>pi-isolate</strong> 是一个全局命令，让你在任意目录以 <strong>项目级隔离配置</strong> 运行 <a href="https://pi.dev">Pi Coding Agent</a>。</p>
+<p><strong>pi-isolate</strong> 是一个全局命令，让你在任意目录以 <strong>项目级隔离配置</strong> 运行 <a class="link"   href="https://pi.dev" >Pi Coding Agent<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>。</p>
 <ul>
-<li>仓库地址：<a href="https://github.com/guyu-guyu/pi-isolate">https://github.com/guyu-guyu/pi-isolate</a></li>
+<li>仓库地址：<a class="link"   href="https://github.com/guyu-guyu/pi-isolate" >https://github.com/guyu-guyu/pi-isolate<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 <li>主要语言：JavaScript (Node.js ≥ 18)</li>
 <li>安装：<code>npm install -g github:guyu-guyu/pi-isolate</code></li>
 </ul>
@@ -487,7 +487,7 @@
 </ul>
 <p><code>pi-isolate</code> 把隔离启动做成一个全局命令：任意目录跑 <code>pi-isolate</code> 就能以隔离模式启动 Pi。</p>
 <h2 id="使用">使用</h2>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> my-project</span><br><span class="line">pi-isolate                <span class="comment"># 以隔离模式启动 pi（等同 pi --approve）</span></span><br><span class="line">pi-isolate -e npm:foo     <span class="comment"># 透传 -e 给 pi（临时扩展）</span></span><br><span class="line">pi-isolate -- --<span class="built_in">help</span>      <span class="comment"># 透传 --help 给 pi（见下文）</span></span><br><span class="line">pi-isolate --<span class="built_in">help</span>         <span class="comment"># 显示 pi-isolate 自身帮助</span></span><br><span class="line">pi-isolate --version      <span class="comment"># 显示版本</span></span><br><span class="line">pi-isolate --pick         <span class="comment"># 进入 TUI 勾选资源（空格切换、回车应用）</span></span><br></pre></td></tr></table></figure>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> my-project</span><br><span class="line">pi-isolate                <span class="comment"># 以隔离模式启动 pi（等同 pi --approve）</span></span><br><span class="line">pi-isolate -e npm:foo     <span class="comment"># 透传 -e 给 pi（临时扩展）</span></span><br><span class="line">pi-isolate -- --<span class="built_in">help</span>      <span class="comment"># 透传 --help 给 pi（见下文）</span></span><br><span class="line">pi-isolate --<span class="built_in">help</span>         <span class="comment"># 显示 pi-isolate 自身帮助</span></span><br><span class="line">pi-isolate --version      <span class="comment"># 显示版本</span></span><br><span class="line">pi-isolate --pick         <span class="comment"># 进入 TUI 勾选资源（空格切换、回车应用）</span></span><br></pre></td></tr></table></figure></div>
 <p><strong>参数分类</strong>：pi-isolate 识别自己的 flag（见下表），其余参数原样透传给 <code>pi --approve</code>。要强制透传（比如把 <code>--help</code> 传给 pi），用 <code>--</code> 分隔：<code>pi-isolate -- --help</code>。</p>
 <table>
 <thead>
@@ -541,7 +541,7 @@
 </table>
 <h2 id="资源拣选">资源拣选</h2>
 <p>默认生成的 <code>settings.json</code> <strong>不带</strong> <code>packages</code> / <code>extensions</code> / <code>skills</code>，避免全局资源泄入隔离环境。需要某个资源时，用 <code>--add-*</code> 把它从全局&quot;拣选&quot;到 <code>.pi-isolated/</code>：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">pi-isolate --add-package npm:pi-vim</span><br><span class="line">pi-isolate --add-package git:github.com/obra/superpowers</span><br><span class="line">pi-isolate --add-extension git-ai</span><br><span class="line">pi-isolate --add-skill brave-search</span><br></pre></td></tr></table></figure>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">pi-isolate --add-package npm:pi-vim</span><br><span class="line">pi-isolate --add-package git:github.com/obra/superpowers</span><br><span class="line">pi-isolate --add-extension git-ai</span><br><span class="line">pi-isolate --add-skill brave-search</span><br></pre></td></tr></table></figure></div>
 <p><strong>机制</strong>：</p>
 <ul>
 <li><strong>packages</strong>：当 <code>settings.json</code> 的 <code>packages</code> 非空时，把全局的 <code>npm/</code> 和 <code>git/</code> 目录 <strong>整体 symlink</strong> 到 <code>.pi-isolated/</code>。这样 Pi 启动时能在磁盘上找到所有引用的包及其传递依赖，<strong>不会触发重装</strong>。最后一个包被移除后 symlink 自动删除。</li>
@@ -589,7 +589,7 @@
 <p>以 launch 模式启动 Pi 前会做两项检查：</p>
 <p><strong>检查 1：npm/ 和 git/ 目录 symlink 一致性</strong> —— 若 <code>packages</code> 非空但对应目录缺失或不再是 symlink，会自动重建；若变成了真实目录（可能是绕过 pi-isolate 跑 <code>pi install</code> 留下的），会提示是否删除改为 symlink。</p>
 <p><strong>检查 2：redirected 与全局的 packages 差异</strong> —— 对比两边 <code>packages</code> 字段，对每个在隔离配置中存在、但在全局中不存在的包，提示三选一：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Package &quot;npm:pi-vim&quot; is in .pi-isolated/settings.json but not in global settings.</span><br><span class="line">  1) Add to global config (~/.pi/agent/settings.json)</span><br><span class="line">  2) Remove from redirected config</span><br><span class="line">  3) Move to project-local config (.pi/settings.json)</span><br><span class="line">Choose [1-3, or Enter to skip]:</span><br></pre></td></tr></table></figure>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">Package &quot;npm:pi-vim&quot; is in .pi-isolated/settings.json but not in global settings.</span><br><span class="line">  1) Add to global config (~/.pi/agent/settings.json)</span><br><span class="line">  2) Remove from redirected config</span><br><span class="line">  3) Move to project-local config (.pi/settings.json)</span><br><span class="line">Choose [1-3, or Enter to skip]:</span><br></pre></td></tr></table></figure></div>
 <h2 id="设计要点">设计要点</h2>
 <ul>
 <li><strong>symlink 而非复制</strong> —— <code>auth.json</code> / <code>models.json</code> 是指针，不含真实数据，即使 <code>.pi-isolated/</code> 被误提交也不会泄露凭证。全局改了即生效。</li>
@@ -599,7 +599,7 @@
 </ul>
 <h2 id="与-novelForgePi-的配合">与 novelForgePi 的配合</h2>
 <p><a   href='/posts/novelForgePi-把Pi改造成小说写作工具/'>novelForgePi-把Pi改造成小说写作工具</a> 的 <code>/new-book</code> 命令会在书项目里建好 <code>.pi-isolated/</code> 并 symlink novelForgePi 包，然后提示你退出 pi 跑 <code>pi-isolate</code>。典型工作流：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> my-novel &amp;&amp; <span class="built_in">cd</span> my-novel</span><br><span class="line">pi                          <span class="comment"># 进入 pi（用全局配置）</span></span><br><span class="line">&gt; /new-book                 <span class="comment"># novelForgePi 建骨架 + .pi-isolated/ + 包 symlink</span></span><br><span class="line">&gt; /quit                     <span class="comment"># 退出 pi</span></span><br><span class="line">pi-isolate                  <span class="comment"># 以隔离模式重启 pi</span></span><br><span class="line">&gt; /write                    <span class="comment"># 继续写作</span></span><br></pre></td></tr></table></figure>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">mkdir</span> my-novel &amp;&amp; <span class="built_in">cd</span> my-novel</span><br><span class="line">pi                          <span class="comment"># 进入 pi（用全局配置）</span></span><br><span class="line">&gt; /new-book                 <span class="comment"># novelForgePi 建骨架 + .pi-isolated/ + 包 symlink</span></span><br><span class="line">&gt; /quit                     <span class="comment"># 退出 pi</span></span><br><span class="line">pi-isolate                  <span class="comment"># 以隔离模式重启 pi</span></span><br><span class="line">&gt; /write                    <span class="comment"># 继续写作</span></span><br></pre></td></tr></table></figure></div>
 <h2 id="安全">安全</h2>
 <ul>
 <li><code>.pi-isolated/.gitignore</code> 会忽略目录内一切（除了自身）</li>
@@ -626,7 +626,7 @@
     <content><![CDATA[<h2 id="项目简介">项目简介</h2>
 <p><strong>scheduleCenter</strong> 是一个 Windows 任务计划程序的管理中间件，提供 <strong>WPF GUI 管理界面 + CLI 模式</strong> 两种使用方式。其他程序/脚本可以通过命令行调用它来增删改查 Windows 定时任务，并获得结构化的 JSON 输出。</p>
 <ul>
-<li>仓库地址：<a href="https://github.com/guyu-guyu/scheduleCenter">https://github.com/guyu-guyu/scheduleCenter</a></li>
+<li>仓库地址：<a class="link"   href="https://github.com/guyu-guyu/scheduleCenter" >https://github.com/guyu-guyu/scheduleCenter<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 <li>主要语言：C# / .NET Framework 4.8</li>
 <li>平台：Windows 10/11</li>
 </ul>
@@ -725,22 +725,22 @@
 <h3 id="双轨触发器语法">双轨触发器语法</h3>
 <p><strong>单触发器（V1 兼容）</strong>：<code>--trigger &lt;type&gt;</code> + 对应参数。</p>
 <p><strong>多触发器（V2 新增）</strong>：<code>--triggers-json</code> 或 <code>--triggers-file</code> 传 JSON 数组：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ScheduleCenter.exe add --name Backup --path C:\app.exe ^</span><br><span class="line">  --triggers-json <span class="string">&quot;[&#123;\&quot;kind\&quot;:\&quot;daily\&quot;,\&quot;time\&quot;:\&quot;09:00\&quot;&#125;,&#123;\&quot;kind\&quot;:\&quot;weekly\&quot;,\&quot;time\&quot;:\&quot;10:00\&quot;,\&quot;days\&quot;:[\&quot;MON\&quot;]&#125;]&quot;</span></span><br></pre></td></tr></table></figure>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">ScheduleCenter.exe add --name Backup --path C:\app.exe ^</span><br><span class="line">  --triggers-json <span class="string">&quot;[&#123;\&quot;kind\&quot;:\&quot;daily\&quot;,\&quot;time\&quot;:\&quot;09:00\&quot;&#125;,&#123;\&quot;kind\&quot;:\&quot;weekly\&quot;,\&quot;time\&quot;:\&quot;10:00\&quot;,\&quot;days\&quot;:[\&quot;MON\&quot;]&#125;]&quot;</span></span><br></pre></td></tr></table></figure></div>
 <h3 id="输出格式">输出格式</h3>
 <p><strong>成功</strong>（stdout，单行 JSON，退出码 0）：</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;success&quot;</span><span class="punctuation">:</span><span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span><span class="attr">&quot;command&quot;</span><span class="punctuation">:</span><span class="string">&quot;add&quot;</span><span class="punctuation">,</span><span class="attr">&quot;task&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;Backup&quot;</span><span class="punctuation">,</span><span class="attr">&quot;path&quot;</span><span class="punctuation">:</span><span class="string">&quot;C:\\app.exe&quot;</span><span class="punctuation">,</span><span class="attr">&quot;triggers&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="punctuation">&#123;</span><span class="attr">&quot;kind&quot;</span><span class="punctuation">:</span><span class="string">&quot;daily&quot;</span><span class="punctuation">,</span><span class="attr">&quot;time&quot;</span><span class="punctuation">:</span><span class="string">&quot;09:00&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">]</span><span class="punctuation">,</span><span class="attr">&quot;enabled&quot;</span><span class="punctuation">:</span><span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span><span class="attr">&quot;nextRunTime&quot;</span><span class="punctuation">:</span><span class="string">&quot;2026-07-24T09:00:00&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<div class="code-container" data-rel="Json"><figure class="iseeu highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;success&quot;</span><span class="punctuation">:</span><span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span><span class="attr">&quot;command&quot;</span><span class="punctuation">:</span><span class="string">&quot;add&quot;</span><span class="punctuation">,</span><span class="attr">&quot;task&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="attr">&quot;name&quot;</span><span class="punctuation">:</span><span class="string">&quot;Backup&quot;</span><span class="punctuation">,</span><span class="attr">&quot;path&quot;</span><span class="punctuation">:</span><span class="string">&quot;C:\\app.exe&quot;</span><span class="punctuation">,</span><span class="attr">&quot;triggers&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="punctuation">&#123;</span><span class="attr">&quot;kind&quot;</span><span class="punctuation">:</span><span class="string">&quot;daily&quot;</span><span class="punctuation">,</span><span class="attr">&quot;time&quot;</span><span class="punctuation">:</span><span class="string">&quot;09:00&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">]</span><span class="punctuation">,</span><span class="attr">&quot;enabled&quot;</span><span class="punctuation">:</span><span class="literal"><span class="keyword">true</span></span><span class="punctuation">,</span><span class="attr">&quot;nextRunTime&quot;</span><span class="punctuation">:</span><span class="string">&quot;2026-07-24T09:00:00&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure></div>
 <p><strong>失败</strong>（stderr，非零退出码）：</p>
-<figure class="highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;success&quot;</span><span class="punctuation">:</span><span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span><span class="attr">&quot;command&quot;</span><span class="punctuation">:</span><span class="string">&quot;add&quot;</span><span class="punctuation">,</span><span class="attr">&quot;error&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="attr">&quot;code&quot;</span><span class="punctuation">:</span><span class="string">&quot;TASK_EXISTS&quot;</span><span class="punctuation">,</span><span class="attr">&quot;message&quot;</span><span class="punctuation">:</span><span class="string">&quot;任务 &#x27;Backup&#x27; 已存在&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<div class="code-container" data-rel="Json"><figure class="iseeu highlight json"><table><tr><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;success&quot;</span><span class="punctuation">:</span><span class="literal"><span class="keyword">false</span></span><span class="punctuation">,</span><span class="attr">&quot;command&quot;</span><span class="punctuation">:</span><span class="string">&quot;add&quot;</span><span class="punctuation">,</span><span class="attr">&quot;error&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span><span class="attr">&quot;code&quot;</span><span class="punctuation">:</span><span class="string">&quot;TASK_EXISTS&quot;</span><span class="punctuation">,</span><span class="attr">&quot;message&quot;</span><span class="punctuation">:</span><span class="string">&quot;任务 &#x27;Backup&#x27; 已存在&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure></div>
 <p>退出码约定：<code>0</code> 成功、<code>1</code> 通用错误、<code>2</code> 参数错误、<code>3</code> 权限不足、<code>4</code> 任务不存在、<code>5</code> 任务已存在。</p>
 <h2 id="与其他项目的配合">与其他项目的配合</h2>
 <p>scheduleCenter 是为给其他程序提供定时任务服务而设计的。比如 <a   href='/posts/AutoVideoCompressor-视频素材定时压缩工具/'>AutoVideoCompressor-视频素材定时压缩工具</a> 的 <code>--run-once</code> 模式就可以交给 scheduleCenter 来定时调度，避免每个工具自己实现一套调度逻辑。</p>
 <h2 id="构建">构建</h2>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">dotnet build ScheduleCenter.sln -c Release</span><br></pre></td></tr></table></figure>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">dotnet build ScheduleCenter.sln -c Release</span><br></pre></td></tr></table></figure></div>
 <p>产物路径：<code>src/ScheduleCenter/bin/Release/net48/ScheduleCenter.exe</code></p>
-<p>主要依赖：<a href="https://github.com/dahall/TaskScheduler">TaskScheduler</a> 2.12.2、Newtonsoft.Json 13.0.3。</p>
+<p>主要依赖：<a class="link"   href="https://github.com/dahall/TaskScheduler" >TaskScheduler<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 2.12.2、Newtonsoft.Json 13.0.3。</p>
 <h2 id="测试">测试</h2>
 <p>使用 MSTest + 真实任务计划程序集成测试，需在管理员终端运行：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">dotnet <span class="built_in">test</span> tests/ScheduleCenter.Core.Tests/ScheduleCenter.Core.Tests.csproj</span><br></pre></td></tr></table></figure>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">dotnet <span class="built_in">test</span> tests/ScheduleCenter.Core.Tests/ScheduleCenter.Core.Tests.csproj</span><br></pre></td></tr></table></figure></div>
 <p>测试任务全部创建在 <code>\ScheduleCenter\Tests\</code> 子文件夹下，命名 <code>Test_&#123;guid&#125;</code>，用完自动清理。当前 66 个测试通过。</p>
 <h2 id="版本历史">版本历史</h2>
 <table>
